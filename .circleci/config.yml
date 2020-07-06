@@ -47,7 +47,7 @@ executors:
   bazel:
     working_directory: ~/barista
     docker:
-      - image: designops/workspace-bazel
+      - image: designops/workspace-bazel:testbranch
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -158,7 +158,7 @@ commands:
           name: Setup Bazel Build Cache
           command: /bazel_build_cache/setup_ci_build_cache.sh
       # npm ci --ignore-scripts &> /dev/null
-      - run: npm ci --ignore-scripts
+      #- run: npm ci --ignore-scripts
 
   get_bazel_testlogs:
     description: >-
@@ -433,22 +433,6 @@ jobs:
           name: Run Build
           command: bazel build //...
 
-# - This target is used to populate the bazel workspace cache for the next runs
-  bazel_info:
-    executor: bazel
-    resource_class: large
-    steps:
-      - setup_bazel_ci
-      - run: bazel info --profile=./bazel-profile.gz --record_full_profiler_data
-      - store_artifacts:
-          path: ./bazel-profile.gz
-          destination: bazel-profile
-      - save_cache:
-          key: *bazel_cache
-          paths:
-            - node_modules
-            - /root/bazel_repository_cache
-
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
@@ -465,11 +449,11 @@ workflows:
 
   bazelify:
     jobs:
-      - bazel_info:
-          context: barista
       - bazel_stylelint:
+          <<: *filter_branches
           context: barista
       - bazel_build:
+          <<: *filter_branches
           context: barista
 
 # - Publish the workspace image on every master build
@@ -568,9 +552,6 @@ workflows:
           context: barista
           requires:
             - build
-      - bazel_ci:
-          <<: *filter_branches
-          context: barista
 
   # Workflow for running build and test on windows
   win-check:
