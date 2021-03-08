@@ -98,7 +98,7 @@ export class DtPagination implements OnInit {
   set currentPage(value: number) {
     const currentPage = coerceNumberProperty(value);
     if (isNumberLike(value) && this._currentPage !== currentPage) {
-      this._currentPage = currentPage;
+      this._setPage(currentPage);
       this._updateItems();
       this._changeDetectorRef.markForCheck();
     }
