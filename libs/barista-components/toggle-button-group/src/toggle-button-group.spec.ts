@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,8 +21,8 @@ import { Component, DebugElement } from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
-  async,
   fakeAsync,
+  waitForAsync,
 } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
@@ -35,21 +35,23 @@ import {
 import { createComponent } from '@dynatrace/testing/browser';
 
 describe('DtToggleButtonGroup', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [DtToggleButtonGroupModule],
-      declarations: [
-        SimpleToggleButtonGroupTestApp,
-        OneSelectedToggleButtonGroupTestApp,
-        OneDisabledToggleButtonGroupTestApp,
-        PropertybindingToggleButtonGroupTestApp,
-        AriaAttributesToggleButtonGroupTestApp,
-        DynamicButtonsToggleButtonGroupTestApp,
-      ],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [DtToggleButtonGroupModule],
+        declarations: [
+          SimpleToggleButtonGroupTestApp,
+          OneSelectedToggleButtonGroupTestApp,
+          OneDisabledToggleButtonGroupTestApp,
+          PropertybindingToggleButtonGroupTestApp,
+          AriaAttributesToggleButtonGroupTestApp,
+          DynamicButtonsToggleButtonGroupTestApp,
+        ],
+      });
 
-    TestBed.compileComponents();
-  }));
+      TestBed.compileComponents();
+    }),
+  );
 
   describe('with basic behavior', () => {
     let fixture: ComponentFixture<SimpleToggleButtonGroupTestApp>;

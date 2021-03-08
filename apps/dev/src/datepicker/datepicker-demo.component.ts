@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,10 @@ import { DtDatePicker } from '@dynatrace/barista-components/experimental/datepic
   styleUrls: ['datepicker-demo.component.scss'],
 })
 export class DatepickerDemo {
+  minHourTimepicker = '';
+  maxHourTimepicker = '';
+  minMinuteTimepicker = '';
+  maxMinuteTimepicker = '';
   startAt = new Date(2020, 7, 31);
   minDate = new Date(2020, 5, 31);
   maxDate = new Date(2020, 11, 31);

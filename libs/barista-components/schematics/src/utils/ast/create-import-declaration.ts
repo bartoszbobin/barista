@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,25 +29,27 @@ export function createImportDeclaration(
   named: boolean = true,
 ): ts.ImportDeclaration {
   const importSpecifiers = symbolName.map((n) =>
-    ts.createImportSpecifier(undefined, ts.createIdentifier(n)),
+    ts.factory.createImportSpecifier(undefined, ts.factory.createIdentifier(n)),
   );
 
   let importClause: ts.ImportClause;
 
   if (named) {
-    importClause = ts.createImportClause(
+    importClause = ts.factory.createImportClause(
+      false,
       undefined,
-      ts.createNamedImports(importSpecifiers),
+      ts.factory.createNamedImports(importSpecifiers),
     );
   } else {
     /** named imports can only have one export */
-    importClause = ts.createImportClause(
-      ts.createIdentifier(symbolName[0]),
+    importClause = ts.factory.createImportClause(
+      false,
+      ts.factory.createIdentifier(symbolName[0]),
       undefined,
     );
   }
 
-  return ts.createImportDeclaration(
+  return ts.factory.createImportDeclaration(
     undefined /** decorators */,
     undefined /** modifiers */,
     importClause,

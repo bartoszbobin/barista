@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,7 +24,7 @@ import { Component, Type, ViewChild } from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
-  async,
+  waitForAsync,
   fakeAsync,
 } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
@@ -66,16 +66,18 @@ describe('DtTreeTable', () => {
     let fixture: ComponentFixture<SimpleDtTreeTableApp>;
     let component: SimpleDtTreeTableApp;
 
-    beforeEach(async(() => {
-      configureDtTreeTableTestingModule([SimpleDtTreeTableApp]);
-      fixture = createComponent(SimpleDtTreeTableApp);
+    beforeEach(
+      waitForAsync(() => {
+        configureDtTreeTableTestingModule([SimpleDtTreeTableApp]);
+        fixture = createComponent(SimpleDtTreeTableApp);
 
-      component = fixture.componentInstance;
-      underlyingDataSource = component.underlyingDataSource;
-      treeTableElement = fixture.nativeElement.querySelector('dt-tree-table');
+        component = fixture.componentInstance;
+        underlyingDataSource = component.underlyingDataSource;
+        treeTableElement = fixture.nativeElement.querySelector('dt-tree-table');
 
-      fixture.detectChanges();
-    }));
+        fixture.detectChanges();
+      }),
+    );
 
     it('with rendered rows', () => {
       const rows = getRows(treeTableElement);

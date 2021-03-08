@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { DtDrawerContent, DtDrawerRowDef, DtDrawerTable } from './drawer-table';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -29,24 +29,26 @@ describe('DtDrawerTable', () => {
   let component: TestComponent;
   let fixture: ComponentFixture<TestComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        TestComponent,
-        DtDrawerTable,
-        DtDrawerRowDef,
-        DtDrawerContent,
-      ],
-      imports: [
-        CommonModule,
-        DtTableModule,
-        DtDrawerModule,
-        BrowserAnimationsModule,
-        DtIconModule.forRoot({ svgIconLocation: '' }),
-        HttpClientModule,
-      ],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [
+          TestComponent,
+          DtDrawerTable,
+          DtDrawerRowDef,
+          DtDrawerContent,
+        ],
+        imports: [
+          CommonModule,
+          DtTableModule,
+          DtDrawerModule,
+          BrowserAnimationsModule,
+          DtIconModule.forRoot({ svgIconLocation: '' }),
+          HttpClientModule,
+        ],
+      }).compileComponents();
+    }),
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(TestComponent);

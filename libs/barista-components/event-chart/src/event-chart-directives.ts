@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 import {
   coerceBooleanProperty,
   coerceNumberProperty,
+  NumberInput,
 } from '@angular/cdk/coercion';
 import {
   Component,
@@ -74,6 +75,7 @@ export class DtEventChartEvent<T> implements OnChanges, OnDestroy {
     this._value = coerceNumberProperty(value);
   }
   private _value: number;
+  static ngAcceptInputType_value: NumberInput;
 
   /**
    * Lane identifier of the DtEventChartEvent. This value determines on which
@@ -93,6 +95,7 @@ export class DtEventChartEvent<T> implements OnChanges, OnDestroy {
     this._duration = coerceNumberProperty(value);
   }
   private _duration = 0;
+  static ngAcceptInputType_duration: NumberInput;
 
   /**
    * Determines the current color of a single event. Either being default,

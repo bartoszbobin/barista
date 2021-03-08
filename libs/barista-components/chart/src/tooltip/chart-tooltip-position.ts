@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  */
 
 import { DtChart, DtChartTooltipData } from '../..';
-import { PlotBackgroundInfo } from '../utils';
+import { DtPlotBackgroundInfo } from '../utils';
 import { ConnectedPosition } from '@angular/cdk/overlay';
 import { InjectionToken } from '@angular/core';
 import { isDefined } from '@dynatrace/barista-components/core';
@@ -33,7 +33,7 @@ export interface DtChartTooltipConfig {
 export type DtChartTooltipPositionFn = (
   data: DtChartTooltipData,
   chart: DtChart,
-  plotBackgroundInfo?: PlotBackgroundInfo,
+  plotBackgroundInfo?: DtPlotBackgroundInfo,
 ) => { x: number; y: number };
 
 /**
@@ -42,7 +42,7 @@ export type DtChartTooltipPositionFn = (
 export const getDefaultTooltipPosition = (
   data: DtChartTooltipData,
   chart: DtChart,
-  plotBackgroundInfo: PlotBackgroundInfo,
+  plotBackgroundInfo: DtPlotBackgroundInfo,
 ): { x: number; y: number } => {
   const containerElement: HTMLElement = chart._container.nativeElement;
   const containerElementBB = containerElement.getBoundingClientRect();
@@ -62,7 +62,7 @@ export const getDefaultTooltipPosition = (
  */
 const getHighchartsTooltipPosition = (
   data: DtChartTooltipData,
-  plotBackgroundInfo: PlotBackgroundInfo,
+  plotBackgroundInfo: DtPlotBackgroundInfo,
 ): { x: number; y: number } => {
   const isPieChart = !isDefined(data.points);
   const hasAreaFirstSeries =

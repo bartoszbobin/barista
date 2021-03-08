@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,9 @@
 export * from './filter-field-async-example/filter-field-async-example';
 export * from './filter-field-clearall-example/filter-field-clearall-example';
 export * from './filter-field-custom-parser-example/filter-field-custom-parser-example';
+export * from './filter-field-custom-placeholder/filter-field-custom-placeholder.example';
 export * from './filter-field-default-example/filter-field-default-example';
+export * from './filter-field-default-search-example/filter-field-default-search-example';
 export * from './filter-field-disabled-example/filter-field-disabled-example';
 export * from './filter-field-distinct-example/filter-field-distinct-example';
 export * from './filter-field-examples.module';

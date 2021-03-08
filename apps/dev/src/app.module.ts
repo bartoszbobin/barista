@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -99,6 +99,7 @@ import {
   DT_DEFAULT_DARK_THEMING_CONFIG,
 } from '@dynatrace/barista-components/core';
 import { ComboboxDemo } from './combobox/combobox-demo.component';
+import { QuickFilterDemoComponent } from './quick-filter/quick-filter-demo.component';
 
 // tslint:disable-next-line: use-component-selector
 @Component({ template: '' })
@@ -181,6 +182,7 @@ export class NoopRouteComponent {}
     SliderDemo,
     SidenavDemo,
     ContainerBreakpointObserverDemo,
+    QuickFilterDemoComponent,
   ],
   bootstrap: [DevApp],
   providers: [

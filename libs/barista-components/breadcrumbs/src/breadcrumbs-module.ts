@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,10 +21,18 @@ import { RouterModule } from '@angular/router';
 
 import { DtBreadcrumbs } from './breadcrumbs';
 import { DtBreadcrumbsItem2 } from './breadcrumbs-item';
+import { PortalModule } from '@angular/cdk/portal';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 @NgModule({
-  exports: [DtBreadcrumbs, DtBreadcrumbsItem2],
+  exports: [DtBreadcrumbs, DtBreadcrumbsItem2, OverlayModule],
   declarations: [DtBreadcrumbs, DtBreadcrumbsItem2],
-  imports: [A11yModule, CommonModule, RouterModule],
+  imports: [
+    A11yModule,
+    CommonModule,
+    RouterModule,
+    PortalModule,
+    OverlayModule,
+  ],
 })
 export class DtBreadcrumbsModule {}

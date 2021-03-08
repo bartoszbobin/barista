@@ -1,11 +1,13 @@
 <dt-stacked-series-chart
   [series]="series"
   [selectable]="selectable"
+  [selectionMode]="selectionMode"
   [(selected)]="selected"
   [valueDisplayMode]="valueDisplayMode"
   [visibleLabel]="visibleLabel"
   [visibleLegend]="visibleLegend"
   [visibleValueAxis]="visibleValueAxis"
+  [labelAxisMode]="labelAxisMode"
   [fillMode]="fillMode"
   [mode]="mode"
   [maxTrackSize]="maxTrackSize"
@@ -27,9 +29,7 @@
       <dt-button-group-item value="column">Column</dt-button-group-item>
     </dt-button-group>
 
-    <h3>
-      Value display mode
-    </h3>
+    <h3>Value display mode</h3>
     <dt-button-group [(value)]="valueDisplayMode">
       <dt-button-group-item value="none">None</dt-button-group-item>
       <dt-button-group-item value="absolute">Absolute</dt-button-group-item>
@@ -56,6 +56,13 @@
     <h3>Label</h3>
     <dt-switch [(ngModel)]="visibleLabel">Visible</dt-switch>
 
+    <h3>Label Axis Mode</h3>
+    <dt-button-group [disabled]="mode === 'bar'" [(value)]="labelAxisMode">
+      <dt-button-group-item value="full">Full</dt-button-group-item>
+      <dt-button-group-item value="compact">Compact</dt-button-group-item>
+      <dt-button-group-item value="auto">Auto</dt-button-group-item>
+    </dt-button-group>
+
     <h3>Track</h3>
     <h4>Background</h4>
     <dt-switch [(ngModel)]="visibleTrackBackground">Visible</dt-switch>
@@ -76,6 +83,15 @@
   <div>
     <h2>Selection</h2>
     <dt-switch [(ngModel)]="selectable">Selectable</dt-switch>
+
+    <h4>Selection Mode</h4>
+    <dt-button-group [(value)]="selectionMode">
+      <dt-button-group-item value="node">Node</dt-button-group-item>
+      <dt-button-group-item value="stack">Stack</dt-button-group-item>
+    </dt-button-group>
+    <br />
+    <br />
+    <button dt-button (click)="clearSelection()">Clear selection</button>
 
     <pre>{{ selected | json }}</pre>
   </div>

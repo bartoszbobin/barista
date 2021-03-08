@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,7 +37,6 @@ import {
   ViewEncapsulation,
   OnDestroy,
   NgZone,
-  Optional,
 } from '@angular/core';
 
 import { DtOption } from '@dynatrace/barista-components/core';
@@ -63,12 +62,13 @@ export interface DtAutocompleteDefaultOptions {
 }
 
 /** Injection token to be used to override the default options for `dt-autocomplete`. */
-export const DT_AUTOCOMPLETE_DEFAULT_OPTIONS = new InjectionToken<
-  DtAutocompleteDefaultOptions
->('dt-autocomplete-default-options', {
-  providedIn: 'root',
-  factory: DT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY,
-});
+export const DT_AUTOCOMPLETE_DEFAULT_OPTIONS = new InjectionToken<DtAutocompleteDefaultOptions>(
+  'dt-autocomplete-default-options',
+  {
+    providedIn: 'root',
+    factory: DT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY,
+  },
+);
 
 /** @docs-private */
 export function DT_AUTOCOMPLETE_DEFAULT_OPTIONS_FACTORY(): DtAutocompleteDefaultOptions {
@@ -220,11 +220,7 @@ export class DtAutocomplete<T>
     private _viewContainerRef: ViewContainerRef,
     @Inject(DT_AUTOCOMPLETE_DEFAULT_OPTIONS)
     defaults: DtAutocompleteDefaultOptions,
-    /**
-     * @deprecated
-     * @breaking-change Will be mandatory with verion 9.0.0
-     */
-    @Optional() private _ngZone?: NgZone,
+    private _ngZone: NgZone,
   ) {
     this._autoActiveFirstOption = !!defaults.autoActiveFirstOption;
   }
@@ -240,7 +236,7 @@ export class DtAutocomplete<T>
         takeUntil(this._destroy$),
       )
       .subscribe((option) => {
-        this._ngZone?.run(() => {
+        this._ngZone.run(() => {
           this._keyManager.setActiveItem(option);
         });
       });
@@ -297,6 +293,30 @@ export class DtAutocomplete<T>
    */
   _getScrollTop(): number {
     return this._panel ? this._panel.nativeElement.scrollTop : 0;
+  }
+
+  /**
+   * @internal
+   * Scrolls the autocomplete up a page.
+   * Default page scroll is 300px
+   */
+  _scrollPageUp(): void {
+    const panelHeight = this._panel.nativeElement.getBoundingClientRect()
+      .height;
+    const newScrollPosition = Math.max(this._getScrollTop() - panelHeight, 0);
+    this._setScrollTop(newScrollPosition);
+  }
+
+  /**
+   * @internal
+   * Scrolls the autocomplete down a page.
+   * Default page scroll is 300px
+   */
+  _scrollPageDown(): void {
+    const panelHeight = this._panel.nativeElement.getBoundingClientRect()
+      .height;
+    const newScrollPosition = this._getScrollTop() + panelHeight;
+    this._setScrollTop(newScrollPosition);
   }
 
   /**

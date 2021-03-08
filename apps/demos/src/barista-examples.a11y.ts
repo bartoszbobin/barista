@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +43,7 @@ const BLOCKLIST: string[] = [
   'filter-field-async-example',
   'filter-field-clearall-example',
   'filter-field-default-example',
+  'filter-field-default-search-example',
   'filter-field-disabled-example',
   'filter-field-distinct-example',
   'filter-field-partial-example',
@@ -58,6 +59,7 @@ const BLOCKLIST: string[] = [
   // for similar reasons as the select and filter field
   // are disabled.
   'combobox-simple-example',
+  'combobox-form-control-example',
   'combobox-custom-option-height-example',
 ];
 

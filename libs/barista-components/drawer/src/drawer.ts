@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  */
 
 import { AnimationEvent } from '@angular/animations';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import {
   AfterContentChecked,
@@ -29,7 +29,6 @@ import {
   OnInit,
   Output,
   ViewEncapsulation,
-  Optional,
   ChangeDetectorRef,
 } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
@@ -123,6 +122,7 @@ export class DtDrawer implements OnInit, AfterContentChecked, OnDestroy {
     this.toggle(coerceBooleanProperty(value));
   }
   private _opened = false;
+  static ngAcceptInputType_opened: BooleanInput;
 
   /**
    * Emits when the drawer open state changes. Emits a boolean value for the
@@ -135,9 +135,8 @@ export class DtDrawer implements OnInit, AfterContentChecked, OnDestroy {
    * @internal
    * Event emitted when the drawer has been opened.
    */
-  @Output('opened') readonly _openedStream: Observable<
-    void
-  > = this.openChange.pipe(
+  @Output('opened')
+  readonly _openedStream: Observable<void> = this.openChange.pipe(
     filter((o) => o),
     map(() => {}),
   );
@@ -146,9 +145,8 @@ export class DtDrawer implements OnInit, AfterContentChecked, OnDestroy {
    * @internal
    * Event emitted when the drawer has been closed.
    */
-  @Output('closed') readonly _closedStream: Observable<
-    void
-  > = this.openChange.pipe(
+  @Output('closed')
+  readonly _closedStream: Observable<void> = this.openChange.pipe(
     filter((o) => !o),
     map(() => {}),
   );
@@ -198,8 +196,7 @@ export class DtDrawer implements OnInit, AfterContentChecked, OnDestroy {
   constructor(
     private _elementRef: ElementRef,
     private _breakpointObserver: BreakpointObserver,
-    /** @breaking-change 9.0.0 - Make mandatory with version 9.0.0 */
-    @Optional() private _changeDetectorRef?: ChangeDetectorRef,
+    private _changeDetectorRef: ChangeDetectorRef,
   ) {
     // distinctUntilChanged is needed because the done event fires twice on some browsers
     // and fire if animation is done
@@ -302,9 +299,6 @@ export class DtDrawer implements OnInit, AfterContentChecked, OnDestroy {
         : 'open-instant'
       : (this._animationState = 'closed');
 
-    /** @breaking-change 9.0.0 - remove if check when changeDetectorRef is no longer optional */
-    if (this._changeDetectorRef) {
-      this._changeDetectorRef.markForCheck();
-    }
+    this._changeDetectorRef.markForCheck();
   }
 }

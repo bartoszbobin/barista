@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -86,6 +86,7 @@ import {
   DtExampleConsumptionError,
   DtExampleConsumptionWarning,
   DtExampleComboboxSimple,
+  DtExampleComboboxFormControl,
   DtExampleContainerBreakpointObserverDefault,
   DtExampleContainerBreakpointObserverIfElse,
   DtExampleContainerBreakpointObserverIf,
@@ -136,8 +137,10 @@ import {
   DtExampleFilterFieldAsync,
   DtExampleFilterFieldClearall,
   DtExampleFilterFieldDefault,
+  DtExampleFilterFieldDefaultSearch,
   DtExampleFilterFieldDisabled,
   DtExampleFilterFieldDistinct,
+  DtExampleFilterFieldInfiniteDataDepth,
   DtExampleFilterFieldPartial,
   DtExampleFilterFieldProgrammaticFilters,
   DtExampleFilterFieldReadOnlyTags,
@@ -306,6 +309,7 @@ import {
   DtExampleTileDisabled,
   DtExampleTileError,
   DtExampleTileMain,
+  DtExampleTileWarning,
   DtExampleTileRecovered,
   DtExampleTileSmall,
   DtExampleTimelineChartDefault,
@@ -322,9 +326,9 @@ import {
   DtExampleTreeTableProblemIndicator,
   DtExampleTreeTableSimple,
   DtExampleComboboxCustomOptionHeight,
-  DtExampleFilterFieldInfiniteDataDepth,
   DtExampleSelectCustomValueTemplate,
   DtExampleCalendarMinMax,
+  DtExampleTimepickerMinMax,
   DtExampleDatepickerDark,
   DtExampleDatepickerDefault
 } from '@dynatrace/barista-examples';
@@ -488,6 +492,10 @@ const ROUTES: Routes = [
     component: DtExampleComboboxSimple,
   },
   {
+    path: 'combobox-form-control-example',
+    component: DtExampleComboboxFormControl,
+  },
+  {
     path: 'combobox-custom-option-height-example',
     component: DtExampleComboboxCustomOptionHeight,
   },
@@ -585,6 +593,7 @@ const ROUTES: Routes = [
   { path: 'drawer-nested-example', component: DtExampleDrawerNested },
   { path: 'drawer-over-example', component: DtExampleDrawerOver },
   { path: 'calendar-min-max-example', component: DtExampleCalendarMinMax},
+  { path: 'timepicker-min-max-example', component: DtExampleTimepickerMinMax},
   { path: 'datepicker-dark-example', component: DtExampleDatepickerDark},
   { path: 'datepicker-default-example', component: DtExampleDatepickerDefault},
   {
@@ -689,6 +698,10 @@ const ROUTES: Routes = [
   {
     path: 'filter-field-default-example',
     component: DtExampleFilterFieldDefault,
+  },
+  {
+    path: 'filter-field-default-search-example',
+    component: DtExampleFilterFieldDefaultSearch,
   },
   {
     path: 'filter-field-disabled-example',
@@ -1122,6 +1135,7 @@ const ROUTES: Routes = [
   { path: 'tile-disabled-example', component: DtExampleTileDisabled },
   { path: 'tile-error-example', component: DtExampleTileError },
   { path: 'tile-main-example', component: DtExampleTileMain },
+  { path: 'tile-warning-example', component: DtExampleTileWarning },
   { path: 'tile-recovered-example', component: DtExampleTileRecovered },
   { path: 'tile-small-example', component: DtExampleTileSmall },
   {

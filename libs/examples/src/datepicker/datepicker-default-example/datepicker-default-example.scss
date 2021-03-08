@@ -1,3 +1,7 @@
 .dt-checkbox {
   margin-top: 10px;
 }
+
+.dt-checkbox + .dt-checkbox {
+  margin-left: 10px;
+}

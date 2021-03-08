@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -348,9 +348,7 @@ describe('DtFilterField', () => {
       inputfields[0].click();
       advanceFilterfieldCycle();
 
-      expect(filterField.filters).toHaveLength(3);
-      // Range filter should have set only the root filter (range def)
-      expect(filterField.filters[2]).toHaveLength(1);
+      expect(filterField.filters).toHaveLength(2);
     });
 
     it('should make the edit to the first tag', () => {

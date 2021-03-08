@@ -1,3 +1,199 @@
+## [9.3.0](https://github.com/dynatrace-oss/barista/compare/9.2.0...9.3.0) (2021-03-05)
+
+### Bug Fixes
+
+- **context-dialog:** Fixes an issue that the scroll container of the
+  context-dialog did not properly resize for large content.
+  ([63d06b7](https://github.com/dynatrace-oss/barista/commit/63d06b7041d0a82431374e0d8a4d1c34b93b5d6b))
+- **filter-field:** Fixes freeTexts set as defaultSearch and unique.
+  ([00532db](https://github.com/dynatrace-oss/barista/commit/00532db76441469995686d5c917be719a06e2df8))
+
+### Features
+
+- **filter-field:** Allow freeText suggestions to be async.
+  ([73bdeea](https://github.com/dynatrace-oss/barista/commit/73bdeea2ee5529381b69652b0c4eddb73be24ae2))
+- **filter-field:** Allow partial suggestions for async multiselect.
+  ([b916dab](https://github.com/dynatrace-oss/barista/commit/b916dab8690c572277964f3305e7284bb28efde8))
+
+## [9.2.0](https://github.com/dynatrace-oss/barista/compare/9.1.0...9.2.0) (2021-02-23)
+
+### Bug Fixes
+
+- **combobox:** Fixes an issue with the arrow positioning on safari.
+  ([a3f2535](https://github.com/dynatrace-oss/barista/commit/a3f25352e67c48b124a6999ec8dd299820216bf4))
+- **expandable-section:** Fixes an issue where toggling the expandable section
+  was triggering a form submission.
+  ([8388bd0](https://github.com/dynatrace-oss/barista/commit/8388bd02875e436bbe8ab26c006edada49a4a5cb))
+- **filter-field:** Improving isOptionSelected method for async values.
+  ([8e352fa](https://github.com/dynatrace-oss/barista/commit/8e352fa61173307a56b42c1646ee33c18e17cc73))
+- **filter-field:** Fixes jumping of filters when the edit state changes.
+  ([54dff6e](https://github.com/dynatrace-oss/barista/commit/54dff6e11eff75001c30bc44f8c42f5de77d1d3d))
+- **quick-filter:** Fixes default search in the quick-filter
+  ([69cd791](https://github.com/dynatrace-oss/barista/commit/69cd79147c87382c433b92b5106806a0bf9d0be5))
+- **radial-chart:** Display of rounded percentage with precision
+  ([d08b808](https://github.com/dynatrace-oss/barista/commit/d08b8085643ce3461b90f3804eb369bd9459a4eb))
+- **stacked-series-chart:** Clearing selection when using stack mode.
+  ([87764fa](https://github.com/dynatrace-oss/barista/commit/87764fa074d03ccc9cf02be735fadf1f6077c663))
+- **stacked-series-chart:** Show stack mode tooltip highlight + proper fix of
+  console error on init.
+  ([70ba2b7](https://github.com/dynatrace-oss/barista/commit/70ba2b75323bb2c63e0ba3cb8aeb49fa93f26ead))
+
+### Features
+
+- **filter-field:** Adds navigation via arrow keys over current filter tags
+  ([c24b85c](https://github.com/dynatrace-oss/barista/commit/c24b85cc6cb5d9f6aa99ea98c4f91eb36519fa88))
+- **tile:** Added warning color to tile component
+  ([ad1b1e6](https://github.com/dynatrace-oss/barista/commit/ad1b1e662a51a1c58b2a8b3101e7a2a190cb74e2))
+
+## [9.1.0](https://github.com/dynatrace-oss/barista/compare/9.0.0...9.1.0) (2021-02-09)
+
+### Bug Fixes
+
+- **breadcrumbs:** Fixes an ExpressionChangedAfterChecked error on the
+  breadcrumbs in non OnPush environments.
+  ([f8d173e](https://github.com/dynatrace-oss/barista/commit/f8d173e8150e1fb8b10f9dc86d4c82518bc37486))
+- **filter-field:** Fixes and issue where users could interact with other
+  filters while editing one. The other filters will now be disabled.
+  ([eeafe6c](https://github.com/dynatrace-oss/barista/commit/eeafe6c6796c3ac381810ef80701384e3c098c36))
+- **filter-field:** Handling asynchronous fetching for multiselect fields.
+  ([896617e](https://github.com/dynatrace-oss/barista/commit/896617e889f847f1f289d0f77c408e150476ceaf))
+- **filter-field, quick-filter:** Fixes an issue when removing a filter while in
+  edit mode for another one caused an error in the filter-field.
+  ([9533c0e](https://github.com/dynatrace-oss/barista/commit/9533c0e1d38864301388ab2cf1e641aee01c5013))
+- **stacked-series-chart:** Temporarily fixes an issue where this component
+  would throw an assertion error in certain cases.
+  ([4c47dae](https://github.com/dynatrace-oss/barista/commit/4c47dae926aa0d1a34c7cbe0620e867b1772784e))
+- **table:** Fixes an issue with partial keyframes on expandable row.
+  ([bb02100](https://github.com/dynatrace-oss/barista/commit/bb02100dac2a98a71a6ad079cab1ca1072a037a9))
+- **table:** Fixes an issue with the expandable row flashing when paginating a
+  table.
+  ([2f106ff](https://github.com/dynatrace-oss/barista/commit/2f106ff95a67bd899d290f872d76f23705615f32))
+- **theming:** Fixes an issue with out of sync recovered colors.
+  ([56f4005](https://github.com/dynatrace-oss/barista/commit/56f400515259450f9b38764bd63d88ee3eabf8dc))
+
+### Features
+
+- **core,table:** Introduces a new sorting behaviour which treats undefined/null
+  values in number compares as ASC first/DESC last.
+  ([7ae439d](https://github.com/dynatrace-oss/barista/commit/7ae439ddfd3ac4ed61011c6ab3aa952dcd76e66a))
+- **filter-field:** Adds a default search option for increased filtering speed.
+  ([43f9d7a](https://github.com/dynatrace-oss/barista/commit/43f9d7a04896b6ebf1b3f55e973228803593415a))
+
+## [9.0.0](https://github.com/dynatrace-oss/barista/compare/8.11.0...9.0.0) (2021-02-01)
+
+This release includes an upgrade to all Angular packages to v11. Typescript was
+also upgraded to a minimum of 4.0.5 and the library now works inside projects
+using the new typescript version.
+
+### BREAKING CHANGES
+
+- **autocomplete:** An injected `DtViewportResizer` is now required for the
+  selection-area component.
+- **autocomplete:** The injected `NgZone` is now required for the autocomplete
+  component.
+- **breadcrumbs:** Add properties needed for responsive breadcrumbs to the
+  constructor.
+- **button-group:** The `selected` property has been removed. Please use
+  `checked` instead.
+- **button-group:** The `selectionChange` event has been removed. Please use
+  `checkedChange` instead.
+- **button-group:** The `DtButtonGroupItemSelectionChange` interface has been
+  removed. Please use `DtButtonGroupItemCheckedChange` instead.
+- **drawer:** An injected `ChangeDetectorRef` is now required for the drawer
+  component.
+- **filter-field:** An injected `DtViewportResizer` is now required for the
+  filter-field component.
+- **linting:** Removed deprecated library which provided custom barista linting
+  rules.
+- **option:** An injected `NgZone` is now required for the option component.
+- **radio:** The field `disabled` in `DtRadioButtonBase` has been changed to a
+  property to avoid an error with TypeScript 4 (see
+  https://github.com/microsoft/TypeScript/pull/37894).
+
+### Bug Fixes
+
+- **chart:** Fixes an issue where tooltipDataChange event did not carry tooltip
+  data.
+  ([d482ef5](https://github.com/dynatrace-oss/barista/commit/d482ef5d431bef01414c9aed493b7bac20daa47d))
+- **quick-filter:** Fix truncation.
+  ([eba5df1](https://github.com/dynatrace-oss/barista/commit/eba5df114efd7f052f188963962f2fb73c381984))
+- **slider:** Fixes an issue with the change event of the input bleeding to the
+  root component.
+  ([788ec62](https://github.com/dynatrace-oss/barista/commit/788ec62927d38a1534d071c58bd7859ae42b6807))
+- **sunburst-chart:** Fix tooltip flicker on click
+  ([cd61537](https://github.com/dynatrace-oss/barista/commit/cd61537cc2891b4c67e0bd8ae48d9440fa7a1c75))
+- **theming:** Fixes an issue with mismatching colors in the error palette.
+  ([5fb1888](https://github.com/dynatrace-oss/barista/commit/5fb188897cd0602f2f07f67e9b85f1bc4ca1c0aa))
+- **theming:** Fixes an issue with mismatching colors in the warning palette.
+  ([839f619](https://github.com/dynatrace-oss/barista/commit/839f619592080280a86e3a458f0221af99b07d1e))
+
+### Features
+
+- **autocomplete:** Added paged keyboard scrolling for autocomplete.
+  ([2804a85](https://github.com/dynatrace-oss/barista/commit/2804a8518df8aa62cbadc73866e4494df099df17))
+- **breadcrumbs:** Introduce responsive behavior.
+  ([0ce1b0d](https://github.com/dynatrace-oss/barista/commit/0ce1b0dca5207a2d1340cfa80c8dcae7aab11c15))
+- **datepicker:** Add min and max limits to the timepicker/timeinput + disable
+  cursor on disabled dates and update readme.
+  ([46edd75](https://github.com/dynatrace-oss/barista/commit/46edd75f9417a5ea923a3e5716fe12a5bd53b44b))
+- **filter-field:** Added custom parser for a incomplete input
+  ([de69b3d](https://github.com/dynatrace-oss/barista/commit/de69b3d58acf2fa3d69accc48ad7dd0e7540959b))
+- **stacked-series-chart:** Add compact mode.
+  ([48cc0f1](https://github.com/dynatrace-oss/barista/commit/48cc0f1473fe5cd6d67d62f9966978751400b1a0))
+- **stacked-series-chart:** Added selection mode for entire row.
+  ([4306fbf](https://github.com/dynatrace-oss/barista/commit/4306fbf6f99aa9b1ea8a2cf1c953a17e527c29fb))
+- **sunburst-chart:** Improving view for small screens.
+  ([7087662](https://github.com/dynatrace-oss/barista/commit/7087662c9a294853c9ea3070bc2142b7b0b3ba13))
+
+## [8.11.0](https://github.com/dynatrace-oss/barista/compare/8.10.0...8.11.0) (2021-01-12)
+
+### Bug Fixes
+
+- **chart:** Added DtPlotBackgroundInfo to exported interfaces.
+  ([36f5439](https://github.com/dynatrace-oss/barista/commit/36f5439a6c55166e4e1a0b6f7b271d1eaf0c790d))
+- **quick-filter:** Fixes an issue with initial display of active items in the
+  sidebar.
+  ([45e4ff4](https://github.com/dynatrace-oss/barista/commit/45e4ff407b9371ac683cdcb6bd0aa81f4bde6e87))
+- **tabs:** Fixes an issue where theme custom properties were not applied
+  correctly.
+  ([aab8675](https://github.com/dynatrace-oss/barista/commit/aab8675041c1174ef577c4425dbe194e734c5be4))
+
+### Features
+
+- **filter-field:** Added multiselect feature for autocompletes.
+  ([c29db10](https://github.com/dynatrace-oss/barista/commit/c29db108661327b082c032ecbad87bc82864bdcf))
+
+## [8.10.0](https://github.com/dynatrace-oss/barista/compare/8.9.0...8.10.0) (2021-01-04)
+
+### Bug Fixes
+
+- **combobox:** Fixes an issue where an exception was thrown when loading was
+  true initially.
+  ([4bf5d50](https://github.com/dynatrace-oss/barista/commit/4bf5d50545d2af6f3e7d64defd1af5fcaed1bf9a))
+
+### Features
+
+- **filter-field:** Added interaction state handling and notification.
+  ([93f402f](https://github.com/dynatrace-oss/barista/commit/93f402fb58dbb86580c0e3ecf182dc8c3600e5a6)),
+  closes [#1321](https://github.com/dynatrace-oss/barista/issues/1321)
+
+## [8.9.0](https://github.com/dynatrace-oss/barista/compare/8.8.0...8.9.0) (2020-12-14)
+
+### Bug Fixes
+
+- **quick filter:** Always show selected options in the quickfilter.
+  (APM-266050)
+  ([e1c9a42](https://github.com/dynatrace-oss/barista/commit/e1c9a42fb136fc723764772736985a0cea28e68f))
+- **radial-chart:** Set the correct cursor for selectable parts.
+  ([1ab935b](https://github.com/dynatrace-oss/barista/commit/1ab935bc603419f57616454bb0e85706a60a68df))
+
+### Features
+
+- **core:** Adjusted warning, error and recovered colors to be more accessible.
+  ([1fc35fa](https://github.com/dynatrace-oss/barista/commit/1fc35faa34640ca9dd13c00647762883282f34d1))
+- **table, tree-table:** Increased width of row indicator to improve visibility.
+  ([f5db806](https://github.com/dynatrace-oss/barista/commit/f5db806e8bbf01e62b5328de61711f06a22c767c))
+
 ## [8.8.0](https://github.com/dynatrace-oss/barista/compare/8.7.0...8.8.0) (2020-12-11)
 
 ### Bug Fixes

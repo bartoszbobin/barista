@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,7 +40,7 @@ import {
 } from '@dynatrace/barista-components/core';
 import { clamp, round } from 'lodash-es';
 import { Subject } from 'rxjs';
-import { PlotBackgroundInfo } from '../utils';
+import { DtPlotBackgroundInfo } from '../utils';
 
 import {
   DT_HEATFIELD_OVERLAY_POSITIONS,
@@ -81,9 +81,8 @@ export class DtChartHeatfield
   extends _DtHeatfieldMixinBase
   implements CanColor<DtChartHeatfieldThemePalette>, OnChanges, OnDestroy {
   /** Event emitted when the option is selected or deselected. */
-  @Output() readonly activeChange = new EventEmitter<
-    DtChartHeatfieldActiveChange
-  >();
+  @Output()
+  readonly activeChange = new EventEmitter<DtChartHeatfieldActiveChange>();
 
   /** @internal The current state of the animation. */
   _overlayAnimationState: 'void' | 'fadeIn' = 'void';
@@ -122,7 +121,7 @@ export class DtChartHeatfield
    * is called by the chart.
    * Is used to set the height of the heatfield backdrop.
    */
-  _boundingBox: PlotBackgroundInfo;
+  _boundingBox: DtPlotBackgroundInfo;
 
   /**
    * Positions for the overlay that gets created
@@ -184,7 +183,7 @@ export class DtChartHeatfield
    * and the Highcharts chartObject that is needed to calculate the position
    */
   _initHeatfield(
-    boundingBox: PlotBackgroundInfo,
+    boundingBox: DtPlotBackgroundInfo,
     chartObject: Highcharts.Chart,
   ): void {
     this._boundingBox = boundingBox;

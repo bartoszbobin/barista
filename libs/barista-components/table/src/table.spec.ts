@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { async, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { waitForAsync, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import {
@@ -56,32 +56,34 @@ import {
 import { createComponent } from '@dynatrace/testing/browser';
 
 describe('DtTable', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        CommonModule,
-        DtTableModule,
-        DtEmptyStateModule,
-        DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
-        DtLoadingDistractorModule,
-        HttpClientTestingModule,
-        NoopAnimationsModule,
-        TestExpandableComponentModule,
-        DtIndicatorModule,
-      ],
-      declarations: [
-        TestApp,
-        TestDynamicApp,
-        TestAppMultiExpandableTable,
-        TestStickyHeader,
-        TestIndicatorApp,
-        CustomEmptyState,
-        TestCustomEmptyStateApp,
-      ],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          CommonModule,
+          DtTableModule,
+          DtEmptyStateModule,
+          DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
+          DtLoadingDistractorModule,
+          HttpClientTestingModule,
+          NoopAnimationsModule,
+          TestExpandableComponentModule,
+          DtIndicatorModule,
+        ],
+        declarations: [
+          TestApp,
+          TestDynamicApp,
+          TestAppMultiExpandableTable,
+          TestStickyHeader,
+          TestIndicatorApp,
+          CustomEmptyState,
+          TestCustomEmptyStateApp,
+        ],
+      });
 
-    TestBed.compileComponents();
-  }));
+      TestBed.compileComponents();
+    }),
+  );
 
   // Regular table tests
   describe('Table Rendering', () => {
@@ -695,9 +697,7 @@ describe('DtTable', () => {
 
       <dt-empty-state>
         <dt-empty-state-item>
-          <dt-empty-state-item-title>
-            No host
-          </dt-empty-state-item-title>
+          <dt-empty-state-item-title> No host </dt-empty-state-item-title>
           Test message
         </dt-empty-state-item>
       </dt-empty-state>
@@ -800,9 +800,8 @@ export class TestStickyHeader {
 })
 class TestAppMultiExpandableTable {
   @Input() multiExpand = false;
-  @ViewChildren(DtExpandableRow) private _expandableRows: QueryList<
-    DtExpandableRow
-  >;
+  @ViewChildren(DtExpandableRow)
+  private _expandableRows: QueryList<DtExpandableRow>;
   dataSource: object[] | null | undefined | DtTableDataSource<any> = [
     { col1: 'test 1', col2: 'test 2', details: 'details1' },
     { col1: 'test 1', col2: 'test 2', details: 'details2', expanded: true },

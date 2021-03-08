@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceNumberProperty } from '@angular/cdk/coercion';
+import { coerceNumberProperty, NumberInput } from '@angular/cdk/coercion';
 import {
   AfterContentInit,
   ChangeDetectionStrategy,
@@ -77,6 +77,7 @@ export class DtKeyValueList implements AfterContentInit, OnDestroy {
     this._changeDetectorRef.markForCheck();
   }
   private _columns: number;
+  static ngAcceptInputType_columns: NumberInput;
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {}
 

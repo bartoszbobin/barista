@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ import { load as loadWithCheerio } from 'cheerio';
  */
 export function runWithCheerio(
   content: string,
-  transformFunction: ($: CheerioStatic) => void,
+  transformFunction: ($: cheerio.Root) => void,
 ): string {
   const $ = loadWithCheerio(content);
   transformFunction($);

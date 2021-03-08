@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 import { BaDecisionGraphNode } from './ba-decision-graph-node';
@@ -28,19 +28,23 @@ describe('BaDecisionGraphNode', () => {
   // scrollIntoView is not supported by jest yet.
   window.HTMLElement.prototype.scrollIntoView = jest.fn();
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [BaDecisionGraphNode, BaDecisiongraphNodeNavigation],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [BaDecisionGraphNode, BaDecisiongraphNodeNavigation],
+      }).compileComponents();
+    }),
+  );
 
-  beforeEach(async(() => {
-    fixture = TestBed.createComponent(BaDecisionGraphNode);
-    component = fixture.componentInstance;
-    component.node = nodes[1];
-    component.decisionGraphData = nodes;
-    fixture.detectChanges();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      fixture = TestBed.createComponent(BaDecisionGraphNode);
+      component = fixture.componentInstance;
+      component.node = nodes[1];
+      component.decisionGraphData = nodes;
+      fixture.detectChanges();
+    }),
+  );
 
   it('should set next node to decisiongraph steps', () => {
     expect(component._decisionGraphSteps.length).toBe(1);

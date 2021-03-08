@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -510,7 +510,7 @@ describe('DtSwitch', () => {
       expect(ngModel.touched).toBe(false);
 
       // TODO(alex frass): test that `touched` and `pristine` state are modified appropriately.
-      // This is currently blocked on issues with async() and fakeAsync().
+      // This is currently blocked on issues with waitForAsync() and fakeAsync().
     }));
 
     it('should toggle checked state on click', () => {

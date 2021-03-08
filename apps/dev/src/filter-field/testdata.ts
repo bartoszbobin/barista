@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,18 @@ import { Validators } from '@angular/forms';
 
 export const TEST_DATA = {
   autocomplete: [
+    {
+      name: 'DE',
+      defaultSearch: true,
+      suggestions: [{ name: 'Berlin' }, { name: 'Bremen' }, { name: 'Munich' }],
+      unique: true,
+      validators: [
+        {
+          validatorFn: Validators.minLength(2),
+          error: 'Country code needs at least 2 characters',
+        },
+      ],
+    },
     {
       name: 'AUT',
       distinct: true,
@@ -54,6 +66,12 @@ export const TEST_DATA = {
       async: true,
       distinct: true,
       autocomplete: [],
+    },
+    {
+      name: 'DE (async, freeText)',
+      async: true,
+      unique: true,
+      suggestions: [],
     },
     {
       name: 'CH (async, partial)',
@@ -109,6 +127,35 @@ export const TEST_DATA_ASYNC_2 = {
       validators: [{ validatorFn: Validators.required, error: 'is required' }],
     },
   ],
+};
+
+export const TEST_DATA_ASYNC_FREETEXT = {
+  name: 'DE (async, freeText)',
+  unique: true,
+  suggestions: [{ name: 'Berlin' }, { name: 'München' }],
+};
+
+export const MULTI_SELECT_DATA_ASYNC = {
+  name: 'Years (async)',
+  multiOptions: [
+    { name: '2018' },
+    { name: '2019' },
+    { name: '2020' },
+    { name: '2021' },
+    { name: '2022' },
+    { name: '2023' },
+  ],
+};
+
+export const MULTI_SELECT_DATA_ASYNC_PARTIAL = {
+  name: 'CH (async, partial)',
+  autocomplete: [
+    { name: 'Zürich' },
+    { name: 'Genf' },
+    { name: 'Basel' },
+    { name: 'Bern' },
+  ],
+  partial: true,
 };
 
 export const TEST_DATA_PARTIAL = {

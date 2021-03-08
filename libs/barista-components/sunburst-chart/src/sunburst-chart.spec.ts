@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, ViewChild } from '@angular/core';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   inject,
   TestBed,
@@ -69,26 +69,28 @@ describe('DtSunburstChart', () => {
   };
 
   describe('Default', () => {
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule,
-          DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
-          DtSunburstChartModule,
-        ],
-        declarations: [TestApp],
-        providers: [{ provide: DT_UI_TEST_CONFIG, useValue: overlayConfig }],
-      });
+    beforeEach(
+      waitForAsync(() => {
+        TestBed.configureTestingModule({
+          imports: [
+            HttpClientTestingModule,
+            DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
+            DtSunburstChartModule,
+          ],
+          declarations: [TestApp],
+          providers: [{ provide: DT_UI_TEST_CONFIG, useValue: overlayConfig }],
+        });
 
-      TestBed.compileComponents();
-      fixture = createComponent(TestApp);
-      rootComponent = fixture.componentInstance;
-      component = fixture.debugElement.query(By.directive(DtSunburstChart))
-        .componentInstance;
+        TestBed.compileComponents();
+        fixture = createComponent(TestApp);
+        rootComponent = fixture.componentInstance;
+        component = fixture.debugElement.query(By.directive(DtSunburstChart))
+          .componentInstance;
 
-      selectedChangeSpy = jest.spyOn(component.selectedChange, 'emit');
-      selectSpy = jest.spyOn(component, '_select');
-    }));
+        selectedChangeSpy = jest.spyOn(component.selectedChange, 'emit');
+        selectSpy = jest.spyOn(component, '_select');
+      }),
+    );
 
     describe('Series', () => {
       it('should render after change', () => {
@@ -100,7 +102,7 @@ describe('DtSunburstChart', () => {
         expect(slices.length).toEqual(2);
 
         expect(slices[0].nativeElement.getAttribute('d')).toBe(
-          'M8.817456953860943e-15,-144A144,144,0,1,1,8.817456953860943e-15,144L6.858022075225178e-15,112A112,112,0,1,0,6.858022075225178e-15,-112Z',
+          'M5.75583995599256e-15,-94A94,94,0,1,1,5.75583995599256e-15,94L4.0413344371862654e-15,66A66,66,0,1,0,4.0413344371862654e-15,-66Z',
         );
       });
     });
@@ -240,7 +242,7 @@ describe('DtSunburstChart', () => {
         );
 
         expect(selectedSlice.nativeElement.getAttribute('d')).toBe(
-          'M9.797174393178826e-15,-160A160,160,0,1,1,9.797174393178826e-15,160L6.858022075225178e-15,112A112,112,0,1,0,6.858022075225178e-15,-112Z',
+          'M6.490628035480972e-15,-106A106,106,0,1,1,6.490628035480972e-15,106L4.0413344371862654e-15,66A66,66,0,1,0,4.0413344371862654e-15,-66Z',
         );
       });
 
@@ -354,21 +356,23 @@ describe('DtSunburstChart', () => {
   });
 
   describe('Overlay', () => {
-    beforeEach(async(() => {
-      TestBed.configureTestingModule({
-        imports: [
-          HttpClientTestingModule,
-          DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
-          DtSunburstChartModule,
-          DtOverlayModule,
-          NoopAnimationsModule,
-        ],
-        declarations: [TestWithOverlayApp],
-        providers: [{ provide: DT_UI_TEST_CONFIG, useValue: overlayConfig }],
-      });
+    beforeEach(
+      waitForAsync(() => {
+        TestBed.configureTestingModule({
+          imports: [
+            HttpClientTestingModule,
+            DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
+            DtSunburstChartModule,
+            DtOverlayModule,
+            NoopAnimationsModule,
+          ],
+          declarations: [TestWithOverlayApp],
+          providers: [{ provide: DT_UI_TEST_CONFIG, useValue: overlayConfig }],
+        });
 
-      TestBed.compileComponents();
-    }));
+        TestBed.compileComponents();
+      }),
+    );
 
     beforeEach(inject([OverlayContainer], (oc: OverlayContainer) => {
       overlayContainer = oc;
@@ -389,36 +393,25 @@ describe('DtSunburstChart', () => {
       expect(overlayContainer).toBeDefined();
     });
 
-    it('should display an overlay when hovering over a slice', () => {
-      const firstSlice = fixture.debugElement.query(By.css(selectors.segment));
-
-      dispatchFakeEvent(firstSlice.nativeElement, 'mouseenter');
+    it('should display and hide an overlay when calledff', () => {
+      component.openOverlay(component.slices[0]);
       fixture.detectChanges();
 
-      const overlayPane = overlayContainerElement.querySelector(
+      let overlayPane = overlayContainerElement.querySelector(
         selectors.overlay,
       );
       expect(overlayPane).toBeDefined();
 
       const overlayContent = (overlayPane!.textContent ?? '').trim();
       expect(overlayContent).toBe('Purple');
-    });
 
-    it('should remove the overlay when moving the mouse away from the slice', () => {
-      const firstSlice = fixture.debugElement.query(By.css(selectors.slice));
-      let overlayPane = overlayContainerElement.querySelector(
-        selectors.overlay,
-      );
-
-      dispatchFakeEvent(firstSlice.nativeElement, 'mouseenter');
+      component.closeOverlay();
       fixture.detectChanges();
-      overlayPane = overlayContainerElement.querySelector(selectors.overlay);
 
-      dispatchFakeEvent(firstSlice.nativeElement, 'mouseleave');
-      fixture.detectChanges();
-      overlayPane = overlayContainerElement.querySelector(selectors.overlay);
-
-      expect(overlayPane).toBeNull();
+      // we cannot check if it disappeared because of the animation, so let's check for an alternative
+      expect(
+        overlayPane?.attributes.getNamedItem('attr.aria-hidden'),
+      ).toBeTruthy();
     });
   });
 });

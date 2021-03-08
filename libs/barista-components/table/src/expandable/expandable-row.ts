@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import {
   AnimationBuilder,
   AnimationFactory,
 } from '@angular/animations';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import { UniqueSelectionDispatcher } from '@angular/cdk/collections';
 import {
   AfterContentInit,
@@ -61,7 +61,7 @@ const COLLAPSE_ANIMATE = [
       style({ height: 'auto', visibility: 'hidden', offset: 0 }),
       style({
         height: '0px',
-        minHeight: '0',
+        minHeight: '0px',
         visibility: 'hidden',
         offset: 1,
       }),
@@ -106,9 +106,9 @@ export class DtExpandableRowContent {}
   encapsulation: ViewEncapsulation.Emulated,
   exportAs: 'dtExpandableRow',
 })
-export class DtExpandableRow extends DtRow
+export class DtExpandableRow
+  extends DtRow
   implements OnDestroy, AfterContentInit {
-  private _expanded = false;
   private _uniqueId = `dt-expandable-row-${nextUniqueId++}`;
 
   /** Animation state of the expanded / collapsed row. */
@@ -133,19 +133,19 @@ export class DtExpandableRow extends DtRow
       this._collapse();
     }
   }
+  private _expanded = false;
+  static ngAcceptInputType_expanded: BooleanInput;
 
   /** Event emitted when the row's expandable state changes. */
-  @Output() readonly expandChange = new EventEmitter<
-    DtExpandableRowChangeEvent
-  >();
+  @Output()
+  readonly expandChange = new EventEmitter<DtExpandableRowChangeEvent>();
   /** @internal Event emitted when the row is expanded. */
   @Output('expanded') readonly _expandedStream = this.expandChange.pipe(
     filter((changeEvent) => changeEvent.row.expanded),
   );
   /** @internal Event emitted when the row is collapsed. */
-  @Output('collapsed') readonly _collapsedStream: Observable<
-    DtExpandableRowChangeEvent
-  > = this.expandChange.pipe(
+  @Output('collapsed')
+  readonly _collapsedStream: Observable<DtExpandableRowChangeEvent> = this.expandChange.pipe(
     filter((changeEvent) => !changeEvent.row.expanded),
   );
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,7 +34,7 @@ export function addImportToSourceFile(
     }
   });
 
-  return ts.updateSourceFileNode(sourceFile, [
+  return ts.factory.updateSourceFile(sourceFile, [
     ...imports,
     createImportDeclaration(symbolNames, modulePath),
     ...nodes,

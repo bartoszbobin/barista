@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,6 +80,7 @@ import { ToggleButtonGroupDemo } from './toggle-button-group/toggle-button-group
 import { TopBarNavigationDemo } from './top-bar-navigation/top-bar-navigation-demo.component';
 import { TreeTableDemo } from './tree-table/tree-table-demo.component';
 import { ComboboxDemo } from './combobox/combobox-demo.component';
+import { QuickFilterDemoComponent } from './quick-filter/quick-filter-demo.component';
 
 const routes: Routes = [
   { path: 'alert', component: AlertDemo },
@@ -152,10 +153,11 @@ const routes: Routes = [
   { path: 'toggle-button-group', component: ToggleButtonGroupDemo },
   { path: 'sidenav', component: SidenavDemo },
   { path: 'tree-table', component: TreeTableDemo },
+  { path: 'quick-filter', component: QuickFilterDemoComponent },
 ];
 
 @NgModule({
   exports: [RouterModule],
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
 })
 export class DevAppRoutingModule {}

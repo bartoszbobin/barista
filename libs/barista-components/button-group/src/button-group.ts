@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  */
 
 import { FocusMonitor } from '@angular/cdk/a11y';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import { ENTER, SPACE } from '@angular/cdk/keycodes';
 import {
   AfterContentInit,
@@ -98,6 +98,7 @@ export class DtButtonGroup<T>
     this._disabled = coerceBooleanProperty(value);
     this._markItemsForCheck();
   }
+  static ngAcceptInputType_disabled: BooleanInput;
 
   /** Sets the focus to the first button in the buttongroup. */
   focus(): void {
@@ -147,15 +148,6 @@ export class DtButtonGroup<T>
       });
     }
   }
-}
-
-/**
- * @deprecated
- * @breaking-change Will be removed with version 9.0.0. Please use the `DtButtonGroupItemCheckedChange` instead
- */
-export interface DtButtonGroupItemSelectionChange<T> {
-  source: DtButtonGroupItem<T>;
-  value: T | null;
 }
 
 /** Change event object emitted by DtRadioButton */
@@ -209,30 +201,10 @@ export class DtButtonGroupItem<T>
   private _value: T;
   private _disabled = false;
 
-  /**
-   * @deprecated
-   * @breaking-change will be removed with version 9.0.0 please use the `checkedChange` instead.
-   */
-  @Output() readonly selectionChange = new EventEmitter<
-    DtButtonGroupItemSelectionChange<T>
-  >();
-
   /** Emits a stream when this item is checked or unchecked. */
   @Output() readonly checkedChange = new EventEmitter<
     DtButtonGroupItemCheckedChange<T>
   >();
-
-  /**
-   * @deprecated
-   * @breaking-change will be removed with version 9.0.0 please use the `checked` property instead.
-   */
-  @Input()
-  get selected(): boolean {
-    return this.checked;
-  }
-  set selected(value: boolean) {
-    this.checked = value;
-  }
 
   /** Whether the button-group item is checked. */
   @Input()
@@ -246,6 +218,7 @@ export class DtButtonGroupItem<T>
       this._changeDetectorRef.markForCheck();
     }
   }
+  static ngAcceptInputType_checked: BooleanInput;
 
   /** Whether the button-group item is disabled. */
   @Input()
@@ -259,6 +232,7 @@ export class DtButtonGroupItem<T>
       this._changeDetectorRef.markForCheck();
     }
   }
+  static ngAcceptInputType_disabled: BooleanInput;
 
   /** The bound value. */
   @Input()
@@ -300,8 +274,6 @@ export class DtButtonGroupItem<T>
     event.stopPropagation();
     const groupValueChanged =
       this._buttonGroup && this.value !== this._buttonGroup.value;
-    // TODO: Version 9.0.0 remove this event emission.
-    this.selectionChange.emit({ source: this, value: this.value });
     this.checkedChange.emit({ source: this, value: this.value });
 
     if (this._buttonGroup && groupValueChanged) {

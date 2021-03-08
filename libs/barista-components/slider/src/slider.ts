@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,8 @@
 import {
   coerceBooleanProperty,
   coerceNumberProperty,
+  NumberInput,
+  BooleanInput,
 } from '@angular/cdk/coercion';
 import {
   DOWN_ARROW,
@@ -124,6 +126,7 @@ export class DtSlider implements AfterViewInit, OnDestroy, OnInit {
     }
   }
   private _min: number = 0;
+  static ngAcceptInputType_min: NumberInput;
 
   /**
    * Binding for the maximum value of the slider.
@@ -143,6 +146,7 @@ export class DtSlider implements AfterViewInit, OnDestroy, OnInit {
     }
   }
   private _max: number = 10;
+  static ngAcceptInputType_max: NumberInput;
 
   /**
    * Bindings for the step, if changed, roundShift needs to be recalculated.
@@ -167,6 +171,7 @@ export class DtSlider implements AfterViewInit, OnDestroy, OnInit {
   }
   /** Holds the value of step internally */
   private _step: number = 1;
+  static ngAcceptInputType_step: NumberInput;
 
   /** Binding for the disabled state. */
   @Input()
@@ -180,6 +185,7 @@ export class DtSlider implements AfterViewInit, OnDestroy, OnInit {
     }
   }
   private _isDisabled: boolean = false;
+  static ngAcceptInputType_disabled: BooleanInput;
 
   /**
    * The binding for the value of the slider.
@@ -194,6 +200,7 @@ export class DtSlider implements AfterViewInit, OnDestroy, OnInit {
     }
   }
   private _value: number = 0;
+  static ngAcceptInputType_value: NumberInput;
 
   /** Provides event for value change */
   @Output() change = new EventEmitter<number>();
@@ -285,6 +292,7 @@ export class DtSlider implements AfterViewInit, OnDestroy, OnInit {
    * roundToSnap takes care of snapping the values to the steps
    */
   _inputValueChanged(event: Event): void {
+    event.stopPropagation();
     this._inputFieldValue$.next(
       +(event.currentTarget as HTMLInputElement).value,
     );

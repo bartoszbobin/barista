@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 // tslint:disable no-any max-file-line-count no-unbound-method use-component-selector
 
 import { Component, ViewChild } from '@angular/core';
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 import {
@@ -29,14 +29,16 @@ import {
 import { createComponent } from '@dynatrace/testing/browser';
 
 describe('DtTheme', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [DtThemingModule],
-      declarations: [TestApp, TestAppParent, TestAppChild],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [DtThemingModule],
+        declarations: [TestApp, TestAppParent, TestAppChild],
+      });
 
-    TestBed.compileComponents();
-  }));
+      TestBed.compileComponents();
+    }),
+  );
 
   it('should apply the dt-theme class', () => {
     const fixture = createComponent(TestApp);

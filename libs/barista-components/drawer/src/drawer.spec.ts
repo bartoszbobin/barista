@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,7 @@ import {
 import {
   ComponentFixture,
   TestBed,
-  async,
+  waitForAsync,
   fakeAsync,
   flush,
   inject,
@@ -79,21 +79,23 @@ export function createFixture<T>(
 }
 
 describe('DtDrawer', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [DtDrawerModule, NoopAnimationsModule],
-      declarations: [
-        NoDrawerTestApp,
-        BasicTestApp,
-        FailingTestApp,
-        TestAppOverMode,
-        TestAppDrawerOpened,
-        TestAppWithOverAndSideMode,
-      ],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [DtDrawerModule, NoopAnimationsModule],
+        declarations: [
+          NoDrawerTestApp,
+          BasicTestApp,
+          FailingTestApp,
+          TestAppOverMode,
+          TestAppDrawerOpened,
+          TestAppWithOverAndSideMode,
+        ],
+      });
 
-    TestBed.compileComponents();
-  }));
+      TestBed.compileComponents();
+    }),
+  );
 
   describe('validate drawers', () => {
     it('should throw if there are two drawers with the same mode in the container', () => {
@@ -171,9 +173,14 @@ describe('DtDrawer', () => {
     }));
 
     it('should close the drawer by calling its close function programmatically', fakeAsync(() => {
-      const { instance, containerEl, fixture } = createFixture<
-        TestAppDrawerOpened
-      >(TestAppDrawerOpened, 'dt-drawer-container');
+      const {
+        instance,
+        containerEl,
+        fixture,
+      } = createFixture<TestAppDrawerOpened>(
+        TestAppDrawerOpened,
+        'dt-drawer-container',
+      );
       fixture.detectChanges();
       flush();
 
@@ -250,9 +257,14 @@ describe('DtDrawer', () => {
     }));
 
     it('should close all drawers when the close function is called on the container', fakeAsync(() => {
-      const { instance, fixture, containerEl } = createFixture<
-        TestAppWithOverAndSideMode
-      >(TestAppWithOverAndSideMode, 'dt-drawer-container');
+      const {
+        instance,
+        fixture,
+        containerEl,
+      } = createFixture<TestAppWithOverAndSideMode>(
+        TestAppWithOverAndSideMode,
+        'dt-drawer-container',
+      );
       fixture.detectChanges();
       flush();
 
@@ -409,14 +421,16 @@ describe('DtDrawer screen sizes', () => {
   let breakpointManager: BreakpointObserver;
   let mediaMatcher: FakeMediaMatcher;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [LayoutModule, DtDrawerModule, NoopAnimationsModule],
-      declarations: [BasicTestApp],
-      providers: [{ provide: MediaMatcher, useClass: FakeMediaMatcher }],
-    });
-    TestBed.compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [LayoutModule, DtDrawerModule, NoopAnimationsModule],
+        declarations: [BasicTestApp],
+        providers: [{ provide: MediaMatcher, useClass: FakeMediaMatcher }],
+      });
+      TestBed.compileComponents();
+    }),
+  );
 
   beforeEach(inject(
     [BreakpointObserver, MediaMatcher],

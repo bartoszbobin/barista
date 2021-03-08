@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,6 +15,7 @@
  */
 
 export * from './calendar-min-max-example/calendar-min-max-example';
+export * from './timepicker-min-max-example/timepicker-min-max-example';
 export * from './datepicker-dark-example/datepicker-dark-example';
 export * from './datepicker-default-example/datepicker-default-example';
 export * from './datepicker-examples.module';

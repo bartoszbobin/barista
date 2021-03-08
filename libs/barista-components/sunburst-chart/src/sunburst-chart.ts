@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,7 @@ import {
 } from './sunburst-chart.util';
 
 /** Minimum width of the chart */
-const MIN_WIDTH = 480;
+const MIN_WIDTH = 340;
 
 /**
  * Sunburst chart is a donut chart with multiple levels that get unfolded on click and show an overlay on hover
@@ -101,6 +101,12 @@ export class DtSunburstChart implements AfterContentInit, OnDestroy {
   }
   private _selected: DtSunburstChartTooltipData[];
 
+  /**
+   * Defines the maxlength for the nodes labels.
+   * If it's set to 0, no truncation is applied.
+   */
+  @Input() truncateLabelBy: number = 10;
+
   /** Defines the default label displayed in the center of the sunburst-chart, if no nodes are selected. */
   @Input() noSelectionLabel: string = 'All';
   /** Sets the display mode for the sunburst-chart values to either 'percent' or 'absolute'.  */
@@ -122,9 +128,8 @@ export class DtSunburstChart implements AfterContentInit, OnDestroy {
   @ViewChild('svg') _svgEl;
 
   /** @internal Viewchildren selection for the slices */
-  @ViewChildren(DtSunburstChartSegment) private _segments: QueryList<
-    DtSunburstChartSegment
-  >;
+  @ViewChildren(DtSunburstChartSegment)
+  private _segments: QueryList<DtSunburstChartSegment>;
 
   /** Slices to be painted. Exposed so users can open overlays */
   get slices(): DtSunburstChartNodeSlice[] {
@@ -161,7 +166,7 @@ export class DtSunburstChart implements AfterContentInit, OnDestroy {
   private _filledSeries: DtSunburstChartTooltipData[];
 
   /** Reference to the open overlay. */
-  private _overlayRef: DtOverlayRef<DtSunburstChartTooltipData> | null;
+  private _overlayRef: DtOverlayRef<unknown> | null;
 
   /** @internal Destroy subject to clear subscriptions on component destroy. */
   private readonly _destroy$ = new Subject<void>();
@@ -215,13 +220,16 @@ export class DtSunburstChart implements AfterContentInit, OnDestroy {
       (segm) => segm.slice.data === node.data,
     );
     if (segment) {
-      const element = segment.elementRef.nativeElement as HTMLElement;
-      this._revealOverlay(
-        element,
-        element.getBoundingClientRect().left,
-        element.getBoundingClientRect().top,
-        node.data,
+      this._overlayRef = this._dtOverlayService.create(
+        segment.elementReference,
+        segment.overlayTemplate,
       );
+
+      this._dtOverlayService._positionStrategy.setOrigin({
+        x: segment.elementReference.nativeElement.getBoundingClientRect().left,
+        y: segment.elementReference.nativeElement.getBoundingClientRect().top,
+      });
+      this._overlayRef.updateImplicitContext(segment.slice.data);
     }
   }
 
@@ -266,41 +274,6 @@ export class DtSunburstChart implements AfterContentInit, OnDestroy {
   }
 
   /**
-   * @internal
-   * Handles the mouseEnter on a slice.
-   * Creates an overlay if it is necessary.
-   */
-  _handleOnMouseEnter(
-    event: MouseEvent,
-    slice: DtSunburstChartTooltipData,
-  ): void {
-    this._revealOverlay(
-      event.target as HTMLElement,
-      event.offsetX,
-      event.offsetY,
-      slice,
-    );
-  }
-
-  /**
-   * @internal
-   * Handles the mouseMove on a slice.
-   * Updates the position of the overlay to create a mouseFollow position
-   */
-  _handleOnMouseMove(event: MouseEvent): void {
-    // TODO: remove this `if` once dtOverlayService is mandatory
-    if (this._dtOverlayService) {
-      if (this._overlayRef) {
-        this._dtOverlayService._positionStrategy.setOrigin({
-          x: event.clientX,
-          y: event.clientY,
-        });
-        this._overlayRef.updatePosition();
-      }
-    }
-  }
-
-  /**
    * Sanitization of the custom property is necessary as, custom property assignments do not work
    * in a viewEngine setup. This can be removed with angular version 10, if ivy is no longer opt out.
    */
@@ -310,11 +283,13 @@ export class DtSunburstChart implements AfterContentInit, OnDestroy {
 
   /** Calculates visible slices based on their state */
   private _render(): void {
+    const containerWidth = this._elementRef.nativeElement.getBoundingClientRect()
+      .width;
     const nodesWithState = getNodesWithState(
       this._filledSeries,
       getSelectedId(this._filledSeries, this._selected),
     );
-    this._slices = getSlices(nodesWithState, this._radius);
+    this._slices = getSlices(nodesWithState, this._radius, containerWidth);
 
     if (this._selected && this._selected.length) {
       this._selectedLabel = this._selected.slice(-1)[0].label ?? '';
@@ -325,26 +300,6 @@ export class DtSunburstChart implements AfterContentInit, OnDestroy {
       this._selectedLabel = this.noSelectionLabel;
       this._selectedValue = getValue(this._filledSeries);
       this._selectedRelativeValue = 1;
-    }
-  }
-
-  private _revealOverlay(
-    target: HTMLElement,
-    x: number,
-    y: number,
-    slice: DtSunburstChartTooltipData,
-  ): void {
-    this.closeOverlay();
-
-    // TODO: remove this `if` once dtOverlayService is mandatory
-    if (this._dtOverlayService) {
-      if (this._overlay && !this._overlayRef) {
-        this._overlayRef = this._dtOverlayService.create<
-          DtSunburstChartTooltipData
-        >(target, this._overlay);
-        this._dtOverlayService._positionStrategy.setOrigin({ x, y });
-        this._overlayRef.updateImplicitContext(slice);
-      }
     }
   }
 }

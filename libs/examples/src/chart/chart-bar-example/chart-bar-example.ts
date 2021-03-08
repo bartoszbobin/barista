@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,21 +18,18 @@ import {
   DtChartTooltipConfig,
   DtChartTooltipData,
   DT_CHART_TOOLTIP_CONFIG,
-} from '../../../../barista-components/chart';
-import { PlotBackgroundInfo } from '../../../../barista-components/chart/src/utils';
+  DtPlotBackgroundInfo,
+} from '@dynatrace/barista-components/chart';
 import { Component } from '@angular/core';
 
 const getTooltipPosition = (
   data: DtChartTooltipData,
   chart: DtChart,
-  plotBackgroundInfo?: PlotBackgroundInfo,
+  plotBackgroundInfo: DtPlotBackgroundInfo,
 ): { x: number; y: number } => {
   const containerElement: HTMLElement = chart._container.nativeElement;
   const containerElementBB = containerElement.getBoundingClientRect();
-  const { x, y } = verticalPositionFunction(
-    data,
-    plotBackgroundInfo as PlotBackgroundInfo,
-  );
+  const { x, y } = verticalPositionFunction(data, plotBackgroundInfo);
 
   return {
     x: containerElementBB.left + x,
@@ -42,7 +39,7 @@ const getTooltipPosition = (
 
 const verticalPositionFunction = (
   data: DtChartTooltipData,
-  plotBackgroundInfo: PlotBackgroundInfo,
+  plotBackgroundInfo: DtPlotBackgroundInfo,
 ): { x: number; y: number } => ({
   x: plotBackgroundInfo?.width / 2 + plotBackgroundInfo?.left,
   y: (data.points![0].point as any).tooltipPos![1] + plotBackgroundInfo?.top,

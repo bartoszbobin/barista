@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceNumberProperty } from '@angular/cdk/coercion';
+import { coerceNumberProperty, NumberInput } from '@angular/cdk/coercion';
 import { CdkCellDef, CdkColumnDef } from '@angular/cdk/table';
 import {
   AfterContentInit,
@@ -94,7 +94,15 @@ export class DtColumnDef extends CdkColumnDef implements OnChanges {
 
   /** The proportion of the column compared to the others. */
   // tslint:disable-next-line:no-input-rename
-  @Input('dtColumnProportion') proportion: number;
+  @Input('dtColumnProportion')
+  get proportion(): number {
+    return this._proportion;
+  }
+  set proportion(name: number) {
+    this._proportion = coerceNumberProperty(name);
+  }
+  private _proportion: number;
+  static ngAcceptInputType_proportion: NumberInput;
 
   /** The min width of the column. */
   // TODO: Consider switching to ngStyle syntax in the future - value.unit

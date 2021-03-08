@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -64,6 +64,7 @@ export class DtSecondaryNav implements AfterViewInit, OnDestroy {
     this._multi = coerceBooleanProperty(value);
   }
   private _multi = false;
+  static ngAcceptInputType_multi: BooleanInput;
 
   /** @internal List of all children. */
   @ContentChildren(DtSecondaryNavSection)

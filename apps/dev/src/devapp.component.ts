@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -85,6 +85,7 @@ export class DevApp implements AfterContentInit, OnDestroy {
     { name: 'Pagination', route: '/pagination' },
     { name: 'Progress-bar', route: '/progress-bar' },
     { name: 'Progress-circle', route: '/progress-circle' },
+    { name: 'Quick-Filter', route: '/quick-filter' },
     { name: 'Radial-chart', route: '/radial-chart' },
     { name: 'Radio', route: '/radio' },
     { name: 'Secondary-nav', route: '/secondary-nav' },

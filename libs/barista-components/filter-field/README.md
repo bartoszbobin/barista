@@ -18,31 +18,34 @@ class MyModule {}
 
 ## Inputs
 
-| Name         | Type                      | Default | Description                                                                                                      |
-| ------------ | ------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------- |
-| `dataSource` | `DtFilterFieldDataSource` |         | Provide a DataSource to feed data to the filter-field. This input is mandatory.                                  |
-| `filters`    | `any[][]`                 |         | The currently selected filters. This input can also be used to programmatically add filters to the filter-field. |
-| `label`      | `string`                  |         | The label for the input field. Can be set to something like "Filter by".                                         |
-| `loading`    | `boolean`                 | `false` | Whether the filter-field is loading data and should show a loading spinner.                                      |
-| `disabled`   | `boolean`                 | `false` | Whether the filter-field is disabled.                                                                            |
-| `aria-label` | `string`                  |         | Sets the value for the Aria-Label attribute.                                                                     |
+| Name                  | Type                      | Default                               | Description                                                                                                      |
+| --------------------- | ------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `dataSource`          | `DtFilterFieldDataSource` |                                       | Provide a DataSource to feed data to the filter-field. This input is mandatory.                                  |
+| `filters`             | `any[][]`                 |                                       | The currently selected filters. This input can also be used to programmatically add filters to the filter-field. |
+| `label`               | `string`                  |                                       | The label for the input field. Can be set to something like "Filter by".                                         |
+| `loading`             | `boolean`                 | `false`                               | Whether the filter-field is loading data and should show a loading spinner.                                      |
+| `disabled`            | `boolean`                 | `false`                               | Whether the filter-field is disabled.                                                                            |
+| `aria-label`          | `string`                  |                                       | Sets the value for the Aria-Label attribute.                                                                     |
+| `customEditionParser` | `EditionParserFunction`   | `defaultTagDataForFilterValuesParser` | Default function to parse text during the edition of a filed                                                     |
 
 _Note: Check out the [Data source](components/filter-field#data-source) section
 to understand how to provide the correct data structure for the filter-field._
 
 ## Outputs
 
-| Name                   | Type                                                  | Description                                                                                                              |
-| ---------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `filterChanges`        | `EventEmitter<DtFilterFieldChangeEvent>`              | Event emitted when filters have been added or removed.                                                                   |
-| `currentFilterChanges` | `EventEmitter<DtFilterFieldCurrentFilterChangeEvent>` | Event emitted when a part has been added to the currently selected filter (the filter the user is currently working on). |
-| `inputChange`          | `EventEmitter<string>`                                | Event emitted when the input value changes (e.g. when the user is typing).                                               |
+| Name                     | Type                                                  | Description                                                                                                              |
+| ------------------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `filterChanges`          | `EventEmitter<DtFilterFieldChangeEvent>`              | Event emitted when filters have been added or removed.                                                                   |
+| `currentFilterChanges`   | `EventEmitter<DtFilterFieldCurrentFilterChangeEvent>` | Event emitted when a part has been added to the currently selected filter (the filter the user is currently working on). |
+| `inputChange`            | `EventEmitter<string>`                                | Event emitted when the input value changes (e.g. when the user is typing).                                               |
+| `interactionStateChange` | `EventEmitter<boolean>`                               | Event emitted when the interaction state changes (e.g. when the user interactes with the filter-field).                  |
 
 ## Properties
 
-| Name          | Type                             | Description                                                       |
-| ------------- | -------------------------------- | ----------------------------------------------------------------- |
-| `currentTags` | `Observable<DtFilterFieldTag[]>` | A stream that emits the current tags that the filter field holds. |
+| Name               | Type                             | Description                                                       |
+| ------------------ | -------------------------------- | ----------------------------------------------------------------- |
+| `currentTags`      | `Observable<DtFilterFieldTag[]>` | A stream that emits the current tags that the filter field holds. |
+| `interactionState` | `boolean`                        | Whether the filter-field is being interacted with or not          |
 
 ## Methods
 
@@ -81,13 +84,28 @@ property, when replacing the datasource with the partially loaded data.
 
 <ba-live-example name="DtExampleFilterFieldPartial"></ba-live-example>
 
-## Unique free-text or range options
+## Unique free-text, range or multiselect options
 
 It is possible to set a free-text or range option to be unique. So it can only
-be added once regardless of the value the user added to the free-text input
-field or into the range inputs.
+be added once regardless of the value the user added to the input field.
+
+Multiselection is unique by default.
 
 <ba-live-example name="DtExampleFilterFieldUnique"></ba-live-example>
+
+## Default search
+
+To optimize frequently used labels e.g. `Name`, set a default search option
+(defaultSearch) in your dataSource like shown in the example below. The
+defaultSearch option can then be used similar to a free-text but not quite.
+Instead of selecting a label and then typing, just type the preferred tag e.g
+`Errors` and the filter field will be combine the defaultSearch option name
+(`name: 'Name'`) attribute and the typed text automatically resulting in
+`Name: Errors`.
+
+Type anything while no label is selected to see the Default Search in action.
+
+<ba-live-example name="DtExampleFilterFieldDefaultSearch"></ba-live-example>
 
 ## Filters
 
@@ -101,6 +119,10 @@ Every filter is an array of:
   user. This includes the range operator (`DtFilterFieldRangeOperator`), the
   unit (`string`) of the selected values and the range itself (which can either
   be one `number` value or a `number` tuple).
+- Multi select filters: array of objects that have been selected via a multi
+  select list with checkboxes (the objects are exactly the ones the consumer has
+  provided via the data source). The suggested items can also be refined by
+  typing.
 
 ### Receiving the selected filters
 
@@ -184,10 +206,19 @@ node objects:
 | `isDtOptionDef`       | Whether the provided definition object is of type `NodeDef` and consists of an option definition.                      |
 | `dtGroupDef`          | Creates a node definition object or extends one and applies a group definition object based on the parameters.         |
 | `isDtGroupDef`        | Whether the provided definition object is of type `NodeDef` and consists of a group definition.                        |
+| `dtMultiSelectDef`    | Creates a node definition object or extends one and applies a multi select definition object based on the parameters.  |
+| `isDtMultiSelectDef`  | Whether the provided definition object is of type `NodeDef` and consists of a multi select definition.                 |
 
 ## Behavior
 
 <ba-ux-snippet name="filter-field-behavior"></ba-ux-snippet>
+
+### Multi selection of filter values
+
+Multi select lets users choose more than one value for the same field. The
+result is an array of the same objects the user has passed in the data source.
+
+<ba-live-example name="DtExampleFilterFieldMultiSelect"></ba-live-example>
 
 ### Clear filters
 
@@ -227,6 +258,18 @@ instance.
 
 <ba-live-example name="DtExampleFilterFieldCustomParser"></ba-live-example>
 
+### Changing the default parsing of filter edition placeholder
+
+The filter field exposes a `defaultTagDataForFilterValuesParser` function,
+describing how the placehoder during selection should be parsed. However, this
+function can be extended and replaced through the
+`DT_FILTER_EDITION_VALUES_DEFAULT_PARSER_CONFIG` token, which can be injected in
+the parent component and assigned a function of your own. In addition, this
+token can also be overriden with an input function specific to the component
+using that filter instance.
+
+<ba-live-example name="DtExampleFilterFieldCustomPlaceholder"></ba-live-example>
+
 ### Validators
 
 Handling the user input with validators provides you with control over input
@@ -241,10 +284,6 @@ angular validator interface.
 ### Handling operators (not yet implemented)
 
 <ba-ux-snippet name="filter-field-operators"></ba-ux-snippet>
-
-### Multiselection of filter values (not yet implemented)
-
-<ba-ux-snippet name="filter-field-multiselection"></ba-ux-snippet>
 
 ### Help and errors (not yet implemented)
 

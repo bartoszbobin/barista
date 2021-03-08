@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ import {
 import {
   ComponentFixture,
   TestBed,
-  async,
+  waitForAsync,
   fakeAsync,
   flush,
   inject,
@@ -205,18 +205,21 @@ describe('DtAutocomplete', () => {
       expect(overlayContainerElement.textContent).toContain('California');
     });
 
-    it('should show the panel when the first open is after the initial zone stabilization', async(() => {
-      // Note that we're running outside the Angular zone, in order to be able
-      // to test properly without the subscription from `_subscribeToClosingActions`
-      // giving us a false positive.
-      fixture.ngZone!.runOutsideAngular(() => {
-        fixture.componentInstance.trigger.openPanel();
+    it(
+      'should show the panel when the first open is after the initial zone stabilization',
+      waitForAsync(() => {
+        // Note that we're running outside the Angular zone, in order to be able
+        // to test properly without the subscription from `_subscribeToClosingActions`
+        // giving us a false positive.
+        fixture.ngZone!.runOutsideAngular(() => {
+          fixture.componentInstance.trigger.openPanel();
 
-        Promise.resolve().then(() => {
-          expect(fixture.componentInstance.panel.showPanel).toBe(true);
+          Promise.resolve().then(() => {
+            expect(fixture.componentInstance.panel.showPanel).toBe(true);
+          });
         });
-      });
-    }));
+      }),
+    );
 
     it('should close the panel when the user clicks away', fakeAsync(() => {
       dispatchFakeEvent(input, 'focusin');
@@ -1978,9 +1981,8 @@ class ProgrammaticOptions implements AfterViewInit {
 
   @ViewChild(TemplateRef) templateRef: TemplateRef<unknown>;
 
-  @ViewChild(DtAutocomplete, { static: true }) autocomplete: DtAutocomplete<
-    number
-  >;
+  @ViewChild(DtAutocomplete, { static: true })
+  autocomplete: DtAutocomplete<number>;
 
   @ViewChildren(DtOption) options: QueryList<DtOption<any>>;
 

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -118,9 +118,8 @@ export class DtFilterFieldRange implements AfterViewInit {
   @Output() readonly closed = new EventEmitter<void>();
 
   /** Event that is emitted whenever an option from the list is selected. */
-  @Output() readonly rangeSubmitted = new EventEmitter<
-    DtFilterFieldRangeSubmittedEvent
-  >();
+  @Output()
+  readonly rangeSubmitted = new EventEmitter<DtFilterFieldRangeSubmittedEvent>();
 
   /** Unique ID to be used by filter-field range trigger's "aria-owns" property. */
   id = `dt-filter-field-range-${_uniqueIdCounter++}`;

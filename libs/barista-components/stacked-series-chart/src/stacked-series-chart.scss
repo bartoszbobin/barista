@@ -49,7 +49,8 @@ See stacked-series-chart.layout.md
 }
 
 /** Slice **/
-.dt-stacked-series-chart-slice-selected {
+.dt-stacked-series-chart-node .dt-stacked-series-chart-slice-selected,
+.dt-stacked-series-chart-track-selected.dt-stacked-series-chart-stack {
   cursor: default;
   position: relative;
 
@@ -77,6 +78,21 @@ See stacked-series-chart.layout.md
     width: 1px;
     height: 1px;
     content: ' ';
+  }
+}
+
+.dt-stacked-series-chart-track-label {
+  text-align: center;
+}
+
+.dt-stacked-series-chart-track-label-content {
+  outline: none;
+}
+
+.dt-stacked-series-chart-series-axis-auto-mode {
+  .dt-stacked-series-chart-track-label-content {
+    display: block;
+    white-space: nowrap;
   }
 }
 

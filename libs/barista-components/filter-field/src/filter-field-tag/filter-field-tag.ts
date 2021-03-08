@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,8 @@ import { DtOverlayConfig } from '@dynatrace/barista-components/overlay';
 import { Platform } from '@angular/cdk/platform';
 import { take, takeUntil, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { _readKeyCode } from '@dynatrace/barista-components/core';
+import { LEFT_ARROW, RIGHT_ARROW } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'dt-filter-field-tag',
@@ -43,7 +45,7 @@ import { Subject } from 'rxjs';
   host: {
     '[attr.role]': `'option'`,
     class: 'dt-filter-field-tag',
-    '[class.dt-filter-field-tag-disabled]': '_filterFieldDisabled || disabled',
+    '[class.dt-filter-field-tag-disabled]': 'filterFieldDisabled || disabled',
     '[class.dt-filter-field-tag-read-only]': '!editable',
   },
   encapsulation: ViewEncapsulation.Emulated,
@@ -76,25 +78,42 @@ export class DtFilterFieldTag implements OnDestroy {
   /** Emits when the filter should be made editable (usually by clicking the edit button). */
   @Output() readonly edit = new EventEmitter<DtFilterFieldTag>();
 
-  /** Whether the tag is disabled. */
-  // Note: The disabled mixin can not be used here because the CD needs to be triggerd after it has been set
-  // to reflect the state when programatically setting the property.
+  /** Emits when the left or right arrow key is pressed */
+  @Output() readonly navigateTags = new EventEmitter<{
+    currentTag: DtFilterFieldTag;
+    direction: 'left' | 'right';
+  }>();
+
+  /** Whether the tag is disabled or not */
   @Input()
   get disabled(): boolean {
-    return !this.editable && !this.deletable;
+    return this._disabled;
   }
   set disabled(value: boolean) {
     const coercedValue = coerceBooleanProperty(value);
+    this._disabled = coercedValue;
     this.editable = !coercedValue;
-    this.deletable = !coercedValue;
     this._changeDetectorRef.markForCheck();
   }
+  private _disabled = false;
 
+  /** @internal Whether the tag is temporarily disabled or not. Based on editmode state */
   @Input()
-  get _filterFieldDisabled(): boolean {
+  get temporarilyDisabled(): boolean {
+    return this._temporarilyDisabledState;
+  }
+  set temporarilyDisabled(value: boolean) {
+    this._temporarilyDisabledState = value;
+    this._changeDetectorRef.markForCheck();
+  }
+  private _temporarilyDisabledState: boolean = false;
+
+  /** @internal Whether the whole filter-field is disabled or not */
+  @Input()
+  get filterFieldDisabled(): boolean {
     return this._parentFilterFieldDisabled;
   }
-  set _filterFieldDisabled(value: boolean) {
+  set filterFieldDisabled(value: boolean) {
     this._parentFilterFieldDisabled = value;
     this._changeDetectorRef.markForCheck();
   }
@@ -121,6 +140,14 @@ export class DtFilterFieldTag implements OnDestroy {
       this._changeDetectorRef.markForCheck();
     }
   }
+
+  /** Element refrence to the edit button */
+  @ViewChild('editButton', { read: ElementRef })
+  editButton: ElementRef<HTMLButtonElement>;
+
+  /** Element refrence to the delete button */
+  @ViewChild('deleteButton', { read: ElementRef })
+  deleteButton: ElementRef<HTMLButtonElement>;
 
   /** @internal Element reference to the tag that holds the value. */
   @ViewChild('valueSpan', { read: ElementRef })
@@ -158,8 +185,7 @@ export class DtFilterFieldTag implements OnDestroy {
   _handleRemove(event: MouseEvent): void {
     // Prevent click from bubbling up, so it does not interfere with autocomplete
     event.stopImmediatePropagation();
-
-    if (!this.disabled) {
+    if (!this.disabled && !this.temporarilyDisabled) {
       this.remove.emit(this);
     }
   }
@@ -169,8 +195,23 @@ export class DtFilterFieldTag implements OnDestroy {
     // Prevent click from bubbling up, so it does not interfere with autocomplete
     event.stopImmediatePropagation();
 
-    if (!this.disabled) {
+    if (!this.disabled && !this.temporarilyDisabled) {
       this.edit.emit(this);
+    }
+  }
+
+  /** @internal Handles the arrowkey navigation */
+  _handleKeyUp(event: KeyboardEvent): void {
+    if (!this.temporarilyDisabled) {
+      const keyCode = _readKeyCode(event);
+      if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
+        event.stopImmediatePropagation();
+
+        this.navigateTags.emit({
+          currentTag: this,
+          direction: keyCode === LEFT_ARROW ? 'left' : 'right',
+        });
+      }
     }
   }
 

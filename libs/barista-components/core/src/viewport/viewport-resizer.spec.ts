@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +19,13 @@
 
 import { Platform } from '@angular/cdk/platform';
 import { ViewportRuler } from '@angular/cdk/scrolling';
-import { TestBed, async, fakeAsync, inject, tick } from '@angular/core/testing';
+import {
+  TestBed,
+  waitForAsync,
+  fakeAsync,
+  inject,
+  tick,
+} from '@angular/core/testing';
 
 import { DtViewportResizer } from './viewport-resizer';
 
@@ -33,11 +39,13 @@ function createFakeEvent(type: string): Event {
 describe('DefaultViewportResizer', () => {
   let resizer: DtViewportResizer;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      providers: [ViewportRuler, Platform],
-    });
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        providers: [ViewportRuler, Platform],
+      });
+    }),
+  );
 
   beforeEach(inject(
     [DtViewportResizer],

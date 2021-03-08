@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -108,6 +108,8 @@ describe('DtTimeInput', () => {
       it('should switch focus from the hour to the minute input when typing in 2 digits in the hour input', fakeAsync(() => {
         component.timeInput.minute = null;
         component.timeInput.hour = 14;
+        component.timeInput._hourInput.nativeElement.value = '14';
+        component.timeInput._minuteInput.nativeElement.value = '';
         fixture.detectChanges();
 
         dispatchKeyboardEvent(hourEl, 'keyup', NUMPAD_ONE);
@@ -120,6 +122,8 @@ describe('DtTimeInput', () => {
       it('should switch focus from the hour to the minute input when typing in 2 digits in the hour input, but the minute input only had a valid 1 digit value', fakeAsync(() => {
         component.timeInput.hour = 15;
         component.timeInput.minute = 3;
+        component.timeInput._hourInput.nativeElement.value = '15';
+        component.timeInput._minuteInput.nativeElement.value = '3';
         fixture.detectChanges();
 
         dispatchKeyboardEvent(hourEl, 'keyup', NUMPAD_ONE);
@@ -132,6 +136,7 @@ describe('DtTimeInput', () => {
       it('should not switch focus from the hour to the minute input when typing in only one digit in the hour input', fakeAsync(() => {
         component.timeInput.minute = null;
         component.timeInput.hour = 1;
+        component.timeInput._hourInput.nativeElement.value = '1';
         fixture.detectChanges();
 
         dispatchKeyboardEvent(hourEl, 'keyup', NUMPAD_ONE);
@@ -143,6 +148,8 @@ describe('DtTimeInput', () => {
 
       it('should not switch focus from the hour to the minute input when typing in 2 digits in the hour input, but the minute input already had a valid 2 digit value', fakeAsync(() => {
         component.timeInput.hour = 15;
+        component.timeInput._hourInput.nativeElement.value = '15';
+        component.timeInput._minuteInput.nativeElement.value = '53';
         fixture.detectChanges();
 
         dispatchKeyboardEvent(hourEl, 'keyup', NUMPAD_ONE);
@@ -281,11 +288,9 @@ class SimpleTimeInputTestApp {
 
   @ViewChild(DtTimeInput) timeInput: DtTimeInput;
 
-  @ViewChild('hours', { read: ElementRef }) _hourInput: ElementRef<
-    HTMLInputElement
-  >;
+  @ViewChild('hours', { read: ElementRef })
+  _hourInput: ElementRef<HTMLInputElement>;
 
-  @ViewChild('minutes', { read: ElementRef }) _minuteInput: ElementRef<
-    HTMLInputElement
-  >;
+  @ViewChild('minutes', { read: ElementRef })
+  _minuteInput: ElementRef<HTMLInputElement>;
 }

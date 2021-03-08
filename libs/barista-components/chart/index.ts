@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,6 +26,7 @@ export {
   DT_CHART_TOOLTIP_CONFIG,
 } from './src/tooltip/chart-tooltip-position';
 export { DtChartTooltipData } from './src/highcharts/highcharts-tooltip-types';
+export { DtPlotBackgroundInfo } from './src/utils';
 
 export { DtChartRange } from './src/range/range';
 export { DtChartTimestamp } from './src/timestamp/timestamp';

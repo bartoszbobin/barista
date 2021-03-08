@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,13 @@ export const routes: Routes = [
     loadChildren: () =>
       import('../components/button-group/button-group.module').then(
         (module) => module.DtE2EButtonGroupModule,
+      ),
+  },
+  {
+    path: 'breadcrumbs',
+    loadChildren: () =>
+      import('../components/breadcrumbs/breadcrumbs.module').then(
+        (module) => module.DtE2EBreadcrumbsModule,
       ),
   },
   {
@@ -266,8 +273,9 @@ export const routes: Routes = [
       scrollPositionRestoration: 'enabled',
       anchorScrolling: 'enabled',
       paramsInheritanceStrategy: 'always',
-      enableTracing: false, // Can be set for debugging the router
+      enableTracing: false,
       initialNavigation: 'enabled',
+      relativeLinkResolution: 'legacy',
     }),
   ],
   exports: [RouterModule],

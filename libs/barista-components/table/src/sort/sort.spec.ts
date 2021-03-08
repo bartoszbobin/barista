@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ import {
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { ComponentFixture, TestBed, async } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { Observable } from 'rxjs';
@@ -53,21 +53,23 @@ describe('DtSort', () => {
 
   let component: DtTableSortApp;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        DtTableModule,
-        NoopAnimationsModule,
-        HttpClientTestingModule,
-        DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
-      ],
-      declarations: [
-        DtTableSortApp,
-        DtSortHeaderMissingSortApp,
-        DtSortableInvalidDirection,
-      ],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          DtTableModule,
+          NoopAnimationsModule,
+          HttpClientTestingModule,
+          DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
+        ],
+        declarations: [
+          DtTableSortApp,
+          DtSortHeaderMissingSortApp,
+          DtSortableInvalidDirection,
+        ],
+      }).compileComponents();
+    }),
+  );
 
   beforeEach(() => {
     fixture = createComponent(DtTableSortApp);

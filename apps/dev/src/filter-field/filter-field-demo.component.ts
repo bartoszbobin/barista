@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,25 +15,29 @@
  */
 
 import { AfterViewInit, Component, OnDestroy, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
-
 import {
+  defaultTagDataForFilterValuesParser,
   DtFilterField,
+  DtFilterFieldChangeEvent,
   DtFilterFieldCurrentFilterChangeEvent,
   DtFilterFieldDefaultDataSource,
   DtFilterFieldTag,
-  DtFilterValue,
   DtFilterFieldTagData,
-  defaultTagDataForFilterValuesParser,
+  DtFilterValue,
 } from '@dynatrace/barista-components/filter-field';
-
+import { Subscription } from 'rxjs';
 import { COMPLEX_DATA } from './data';
 import { KUBERNETES_DATA } from './kubernetes-data';
+import { MULTI_SELECT_DATA } from './multi-select';
 import { MULTIDIMENSIONAL_ANALYSIS } from './multidimensional-analysis';
+import { THREE_LEVELS_NESTED_DATA } from './three-levels-nested-data';
 import {
+  MULTI_SELECT_DATA_ASYNC,
+  MULTI_SELECT_DATA_ASYNC_PARTIAL,
   TEST_DATA,
   TEST_DATA_ASYNC,
   TEST_DATA_ASYNC_2,
+  TEST_DATA_ASYNC_FREETEXT,
   TEST_DATA_PARTIAL,
   TEST_DATA_PARTIAL_2,
 } from './testdata';
@@ -44,11 +48,13 @@ const DATA_SETS = new Map<string, any>([
   ['TEST_DATA', TEST_DATA],
   ['KUBERNETES_DATA', KUBERNETES_DATA],
   ['COMPLEX_DATA', COMPLEX_DATA],
+  ['MULTI_SELECT_DATA', MULTI_SELECT_DATA],
   ['MULTIDIMENSIONAL_ANALYSIS', MULTIDIMENSIONAL_ANALYSIS],
+  ['THREE_LEVELS_NESTED_DATA', THREE_LEVELS_NESTED_DATA],
 ]);
 
 // Different object reference
-const blaFree = [
+const usFree = [
   {
     name: 'US',
     autocomplete: [
@@ -71,7 +77,7 @@ const blaFree = [
   { name: 'philly' },
 ] as any;
 
-// const blaOption = [
+// const usOption = [
 //   {
 //     name: 'US',
 //     autocomplete: [
@@ -92,7 +98,7 @@ const blaFree = [
 //   },
 // ] as any;
 
-const blaRange = [
+const range = [
   {
     name: 'Requests per minute',
     range: {
@@ -145,12 +151,21 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
   _dataSource = new DtFilterFieldDefaultDataSource(TEST_DATA);
   _loading = false;
   _disabled = false;
+  _filters;
+  _useCustomEditorParser: boolean;
 
   ngAfterViewInit(): void {
+    // Hack so we can read and interact with the filter-field
+    (window as any).filterField = this.filterField;
+
     this.filterField.currentTags.subscribe((tags) => {
       if (tags.length) {
         this._firstTag = tags[0];
       }
+    });
+
+    this.filterField.interactionStateChange.subscribe((isInteracted) => {
+      console.log('interactionState: ', isInteracted);
     });
   }
 
@@ -158,8 +173,8 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
     this._tagChangesSub.unsubscribe();
   }
 
-  filterChanges(event: any): void {
-    console.log(event);
+  filterChanges(event: DtFilterFieldChangeEvent<any>): void {
+    this._filters = event.filters;
   }
 
   currentFilterChanges(
@@ -168,21 +183,38 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
     // Cancel current timer if running
     clearTimeout(this._timerHandle);
 
-    if (event.currentFilter[0] === TEST_DATA.autocomplete[2]) {
+    this._partialFilter = false;
+    if (event.currentFilter[0] === TEST_DATA.autocomplete[3]) {
       // Simulate async data loading
       this._timerHandle = setTimeout(() => {
         this._dataSource.data = TEST_DATA_ASYNC;
       }, 2000);
-    } else if (event.currentFilter[0] === TEST_DATA.autocomplete[3]) {
+    } else if (event.currentFilter[0] === TEST_DATA.autocomplete[4]) {
       // Simulate async data loading
       this._timerHandle = setTimeout(() => {
         this._dataSource.data = TEST_DATA_ASYNC_2;
       }, 2000);
-    } else if (event.currentFilter[0] === TEST_DATA.autocomplete[4]) {
+    } else if (event.currentFilter[0] === TEST_DATA.autocomplete[5]) {
+      // Simulate async data loading
+      this._timerHandle = setTimeout(() => {
+        this._dataSource.data = TEST_DATA_ASYNC_FREETEXT;
+      }, 2000);
+    } else if (event.currentFilter[0] === TEST_DATA.autocomplete[6]) {
       this._partialFilter = true;
       // Simulate async data loading
       this._timerHandle = setTimeout(() => {
         this._dataSource.data = TEST_DATA_PARTIAL;
+      }, 2000);
+    } else if (event.currentFilter[0] === MULTI_SELECT_DATA.autocomplete[0]) {
+      // Simulate async data loading
+      this._timerHandle = setTimeout(() => {
+        this._dataSource.data = MULTI_SELECT_DATA_ASYNC;
+      }, 2000);
+    } else if (event.currentFilter[0] === MULTI_SELECT_DATA.autocomplete[3]) {
+      this._partialFilter = true;
+      // Simulate async data loading
+      this._timerHandle = setTimeout(() => {
+        this._dataSource.data = MULTI_SELECT_DATA_ASYNC_PARTIAL;
       }, 2000);
     }
   }
@@ -207,9 +239,32 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
     }
   }
 
+  toggledDisableEditableFirstTag(): void {
+    if (this._firstTag) {
+      this._firstTag.editable = !this._firstTag.editable;
+    }
+  }
+
+  toggledDisableDeletableFirstTag(): void {
+    if (this._firstTag) {
+      this._firstTag.deletable = !this._firstTag.deletable;
+    }
+  }
+
   setValues(): void {
     if (this._dataSource.data === TEST_DATA) {
       this.filterField.filters = [
+        // AUT Vienna
+        [TEST_DATA.autocomplete[0], TEST_DATA.autocomplete[0].autocomplete![1]],
+        // Range
+        [
+          TEST_DATA.autocomplete[6],
+          {
+            operator: 'range',
+            range: [2, 3],
+            unit: 's',
+          },
+        ],
         // // Free text
         // [
         //   TEST_DATA.autocomplete[0],
@@ -223,8 +278,8 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
         // // option as a string
         // [TEST_DATA.autocomplete[0], TEST_DATA.autocomplete[0].autocomplete![1]],
 
-        blaFree,
-        blaRange,
+        // usFree,
+        // range,
 
         // Range
         // [
@@ -240,25 +295,26 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
   }
 
   filters = [
-    // Free text
-    [
-      TEST_DATA.autocomplete[0],
-      TEST_DATA.autocomplete[0].autocomplete![2],
-      'foo',
-    ],
-
-    // async data
-    [TEST_DATA.autocomplete[2], (TEST_DATA_ASYNC as any).autocomplete[0]],
-
-    // option as a string
-    [TEST_DATA.autocomplete[0], TEST_DATA.autocomplete[0].autocomplete![1]],
+    // // Free text
+    // [
+    //   TEST_DATA.autocomplete[0],
+    //   TEST_DATA.autocomplete[0].autocomplete![2],
+    //   'foo',
+    // ],
+    // // async data
+    // [TEST_DATA.autocomplete[2], (TEST_DATA_ASYNC as any).autocomplete[0]],
+    // // option as a string
+    // [TEST_DATA.autocomplete[0], TEST_DATA.autocomplete[0].autocomplete![1]],
   ];
 
   getTagForFilter(): void {
-    const rangeTag = this.filterField.getTagForFilter(blaRange);
+    const rangeTag = this.filterField.getTagForFilter(range);
     rangeTag!.deletable = false;
-    const freeTag = this.filterField.getTagForFilter(blaFree);
+    const freeTag = this.filterField.getTagForFilter(usFree);
     freeTag!.editable = false;
+  }
+  getEditionForFilter(): void {
+    this._useCustomEditorParser = !this._useCustomEditorParser;
   }
 
   customParser(
@@ -275,5 +331,34 @@ export class FilterFieldDemo implements AfterViewInit, OnDestroy {
       tagData.key = '❤ ' + tagData.key;
     }
     return tagData;
+  }
+
+  customEditionParser(filterValues: DtFilterValue[]): string {
+    return (
+      '✏ ' +
+      (filterValues?.map((value: any) => value.data.name).join('.') ??
+        'no data')
+    );
+  }
+
+  setDeletableFirstTag(): void {
+    if (this._firstTag) {
+      this._firstTag.deletable = !this._firstTag.deletable;
+    }
+  }
+
+  toggleDeletableAll(): void {
+    this.filterField.currentTags.forEach((tags) => {
+      tags.forEach((tag) => {
+        tag.deletable = !tag.deletable;
+      });
+    });
+  }
+
+  addTagProgramatically(): void {
+    const filters = [
+      [TEST_DATA.autocomplete[1], TEST_DATA.autocomplete[1].autocomplete![0]],
+    ];
+    this.filterField.filters = filters;
   }
 }

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  */
 
 import { FocusMonitor } from '@angular/cdk/a11y';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -71,8 +71,11 @@ export const _DtToggleButtonMixinBase = mixinTabIndex(
   preserveWhitespaces: false,
   encapsulation: ViewEncapsulation.Emulated,
 })
-export class DtToggleButtonItem<T> extends _DtToggleButtonMixinBase
+export class DtToggleButtonItem<T>
+  extends _DtToggleButtonMixinBase
   implements CanDisable, HasTabIndex {
+  static ngAcceptInputType_disabled: BooleanInput;
+
   private _selected = false;
   private _value: T;
 
@@ -92,6 +95,7 @@ export class DtToggleButtonItem<T> extends _DtToggleButtonMixinBase
       this.deselect();
     }
   }
+  static ngAcceptInputType_selected: BooleanInput;
 
   /** The value of this toggle button item. */
   @Input()

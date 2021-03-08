@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -112,6 +112,7 @@ export class DtExpandablePanel {
     }
   }
   private _expanded = false;
+  static ngAcceptInputType_expanded: BooleanInput;
 
   /** Whether the panel is disabled. */
   @Input()
@@ -127,21 +128,23 @@ export class DtExpandablePanel {
     this._changeDetectorRef.markForCheck();
   }
   private _disabled = false;
+  static ngAcceptInputType_disabled: BooleanInput;
 
   /** Event emitted when the panel's expandable state changes. */
-  @Output() readonly expandChange: EventEmitter<boolean> = new EventEmitter<
-    boolean
-  >();
+  @Output()
+  readonly expandChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /** @internal Event emitted when the panel is expanded. */
-  @Output('expanded') readonly _panelExpanded: Observable<
-    boolean
-  > = this.expandChange.pipe(filter((v) => v));
+  @Output('expanded')
+  readonly _panelExpanded: Observable<boolean> = this.expandChange.pipe(
+    filter((v) => v),
+  );
 
   /**  @internal Event emitted when the panel is collapsed. */
-  @Output('collapsed') readonly _panelCollapsed: Observable<
-    boolean
-  > = this.expandChange.pipe(filter((v) => !v));
+  @Output('collapsed')
+  readonly _panelCollapsed: Observable<boolean> = this.expandChange.pipe(
+    filter((v) => !v),
+  );
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {}
 

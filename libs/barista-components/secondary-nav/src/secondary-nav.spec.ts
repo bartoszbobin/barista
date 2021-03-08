@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,7 @@
  */
 
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   TestBed,
   fakeAsync,
@@ -38,23 +38,25 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { createComponent } from '@dynatrace/testing/browser';
 
 describe('DtSecondaryNav', () => {
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        DtSecondaryNavModule,
-        HttpClientTestingModule,
-        NoopAnimationsModule,
-        DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
-      ],
-      declarations: [
-        SingleSection,
-        SingleSectionActive,
-        SingleSectionNoExpand,
-        MultiSection,
-        SingleSectionWithActiveLink,
-      ],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          DtSecondaryNavModule,
+          HttpClientTestingModule,
+          NoopAnimationsModule,
+          DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
+        ],
+        declarations: [
+          SingleSection,
+          SingleSectionActive,
+          SingleSectionNoExpand,
+          MultiSection,
+          SingleSectionWithActiveLink,
+        ],
+      }).compileComponents();
+    }),
+  );
 
   describe('single section', () => {
     let fixture: ComponentFixture<SingleSection>;

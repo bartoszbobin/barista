@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@ import {
   trigger,
 } from '@angular/animations';
 import { ActiveDescendantKeyManager, FocusMonitor } from '@angular/cdk/a11y';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import { SelectionModel } from '@angular/cdk/collections';
 import {
   DOWN_ARROW,
@@ -342,6 +342,7 @@ export class DtSelect<T>
     this.stateChanges.next();
   }
   private _required = false;
+  static ngAcceptInputType_required: BooleanInput;
 
   /**
    * Function to compare the option values with the selected values. The first argument

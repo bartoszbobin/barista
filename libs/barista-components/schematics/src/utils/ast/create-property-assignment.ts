@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,5 +20,8 @@ export function createPropertyAssignment(
   name: string,
   expression: ts.Expression,
 ): ts.PropertyAssignment {
-  return ts.createPropertyAssignment(ts.createIdentifier(name), expression);
+  return ts.factory.createPropertyAssignment(
+    ts.factory.createIdentifier(name),
+    expression,
+  );
 }

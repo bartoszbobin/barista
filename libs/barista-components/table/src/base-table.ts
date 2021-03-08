@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import { Platform } from '@angular/cdk/platform';
 import {
   CDK_TABLE_TEMPLATE,
@@ -49,6 +49,7 @@ export class _DtTableBase<T> extends CdkTable<T> {
   set interactiveRows(value: boolean) {
     this._interactiveRows = coerceBooleanProperty(value);
   }
+  static ngAcceptInputType_interactiveRows: BooleanInput;
 
   constructor(
     differs: IterableDiffers,

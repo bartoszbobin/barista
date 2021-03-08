@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,11 +17,21 @@
 import { ViewportRuler } from '@angular/cdk/overlay';
 import { Platform } from '@angular/cdk/platform';
 import { NgZone } from '@angular/core';
+import { inject } from '@angular/core/testing';
+import { DOCUMENT } from '@angular/common';
 import { MockNgZone } from '@dynatrace/testing/browser';
 import { DtDefaultViewportResizer, DtViewportResizer } from '../viewport';
 import { mixinViewportBoundaries } from './viewport-boundaries';
 
+let document: Document;
+
 describe('MixinViewportBoundaries', () => {
+  beforeEach(() => {
+    inject([DOCUMENT], (doc: Document) => {
+      document = doc;
+    });
+  });
+
   it('should augment an existing class with a _viewportBoundaries$ property', () => {
     const classWithDisabled = mixinViewportBoundaries(TestClass);
     const instance = new classWithDisabled();
@@ -42,7 +52,7 @@ describe('MixinViewportBoundaries', () => {
 class TestClass {
   _platform = new Platform('testid');
   _zone: NgZone = new MockNgZone();
-  _viewportRuler = new ViewportRuler(this._platform, this._zone);
+  _viewportRuler = new ViewportRuler(this._platform, this._zone, document);
   /** Fake instance of an DtViewportResizer. */
   _viewportResizer: DtViewportResizer = new DtDefaultViewportResizer(
     this._viewportRuler,

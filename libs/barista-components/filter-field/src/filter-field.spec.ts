@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,7 +17,14 @@
 // tslint:disable no-lifecycle-call no-use-before-declare no-magic-numbers
 // tslint:disable no-any max-file-line-count no-unbound-method use-component-selector
 
-import { BACKSPACE, DOWN_ARROW, ENTER, ESCAPE } from '@angular/cdk/keycodes';
+import {
+  BACKSPACE,
+  DOWN_ARROW,
+  ENTER,
+  ESCAPE,
+  LEFT_ARROW,
+  RIGHT_ARROW,
+} from '@angular/cdk/keycodes';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import {
   ComponentFixture,
@@ -30,7 +37,6 @@ import { By } from '@angular/platform-browser';
 import {
   DtFilterField,
   DtFilterFieldChangeEvent,
-  DT_FILTER_FIELD_TYPING_DEBOUNCE,
 } from '@dynatrace/barista-components/filter-field';
 import {
   createComponent,
@@ -39,14 +45,20 @@ import {
   MockNgZone,
 } from '@dynatrace/testing/browser';
 import {
+  FILTER_FIELD_TEST_DATA,
   FILTER_FIELD_TEST_DATA_ASYNC,
   FILTER_FIELD_TEST_DATA_SINGLE_DISTINCT,
   FILTER_FIELD_TEST_DATA_SINGLE_OPTION,
 } from '@dynatrace/testing/fixtures';
+import { EditionParserFunction } from './filter-field-config';
 import { TEST_DATA_EDITMODE_ASYNC } from './filter-field-edit-mode.spec';
 import {
   TEST_DATA_SUGGESTIONS,
   TEST_DATA_EDITMODE,
+  TEST_DATA_RANGE,
+  TEST_DATA_PLACEHOLDER,
+  TEST_DATA_KEYBOARD_NAVIGATION,
+  TEST_DEFAULT_SEARCH_UNIQUE,
 } from './testing/filter-field-test-data';
 import {
   TestApp,
@@ -61,6 +73,7 @@ import {
   getTagButtons,
   isClearAllVisible,
 } from './testing/filter-field-test-helpers';
+import { DtAutocompleteValue, DtFilterValue } from './types';
 
 describe('DtFilterField', () => {
   let fixture: ComponentFixture<TestApp>;
@@ -216,6 +229,8 @@ describe('DtFilterField', () => {
             .autocomplete[0],
         ],
       ];
+      fixture.detectChanges();
+      advanceFilterfieldCycle(true, true);
       filterField.filters = filters;
       fixture.detectChanges();
       advanceFilterfieldCycle(true, true);
@@ -252,12 +267,384 @@ describe('DtFilterField', () => {
     });
   });
 
+  describe('keyboard navigation', () => {
+    beforeEach(() => {
+      fixture.componentInstance.dataSource.data = TEST_DATA_KEYBOARD_NAVIGATION;
+      advanceFilterfieldCycle();
+    });
+
+    describe('with deletable', () => {
+      it('should focus first editButton. Focus: Input -> LEFT_ARROW x2', fakeAsync(() => {
+        const autocompleteFilter = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        filterField.filters = [autocompleteFilter];
+        fixture.detectChanges();
+
+        filterField.focus();
+        const inputEl = getInput(fixture);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        const tags = getFilterTags(fixture);
+        const tag = getTagButtons(tags[0]);
+
+        dispatchKeyboardEvent(tag.deleteButton, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(tag.label);
+      }));
+
+      it('should keep focus on first editButton. Focus: Input -> LEFT_ARROW x3', fakeAsync(() => {
+        const autocompleteFilter = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        filterField.filters = [autocompleteFilter];
+        fixture.detectChanges();
+
+        filterField.focus();
+        const inputEl = getInput(fixture);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        const tags = getFilterTags(fixture);
+        const tag = getTagButtons(tags[0]);
+
+        dispatchKeyboardEvent(tag.deleteButton, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tag.label, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(tag.label);
+      }));
+
+      it('should focus second editButton. Focus: Input -> LEFT_ARROW x4', fakeAsync(() => {
+        const autocompleteFilterUA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        const autocompleteFilterLA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[1],
+        ];
+        filterField.filters = [autocompleteFilterUA, autocompleteFilterLA];
+        fixture.detectChanges();
+
+        filterField.focus();
+        const inputEl = getInput(fixture);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        const tags = getFilterTags(fixture);
+        const tagLA = getTagButtons(tags[1]);
+        const tagUA = getTagButtons(tags[0]);
+
+        dispatchKeyboardEvent(tagLA.deleteButton, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tagLA.label, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tagUA.deleteButton, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(tagUA.label);
+      }));
+
+      it('should focus input element. Focus: Input -> LEFT_ARROW -> RIGHT_ARROW', fakeAsync(() => {
+        const autocompleteFilter = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        filterField.filters = [autocompleteFilter];
+        fixture.detectChanges();
+
+        const inputEl = getInput(fixture);
+        const tags = getFilterTags(fixture);
+        const tag = getTagButtons(tags[0]);
+
+        filterField.focus();
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tag.deleteButton, 'keyup', RIGHT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(inputEl);
+      }));
+
+      it('should focus input element. Focus: Input -> LEFT_ARROW x3 -> RIGHT_ARROW x3', fakeAsync(() => {
+        const autocompleteFilterUA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        const autocompleteFilterLA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[1],
+        ];
+        filterField.filters = [autocompleteFilterUA, autocompleteFilterLA];
+        fixture.detectChanges();
+
+        const inputEl = getInput(fixture);
+        const tags = getFilterTags(fixture);
+        const tagUA = getTagButtons(tags[0]);
+        const tagLA = getTagButtons(tags[1]);
+
+        filterField.focus();
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tagUA.deleteButton, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+        dispatchKeyboardEvent(tagUA.label, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tagLA.deleteButton, 'keyup', RIGHT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tagUA.label, 'keyup', RIGHT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tagUA.deleteButton, 'keyup', RIGHT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(inputEl);
+      }));
+    });
+
+    describe('without deletable', () => {
+      it('should focus first editButton. Focus: Input -> LEFT_ARROW', fakeAsync(() => {
+        const autocompleteFilter = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        filterField.filters = [autocompleteFilter];
+        filterField.tagData[0].deletable = false;
+        fixture.detectChanges();
+
+        const inputEl = getInput(fixture);
+        const tags = getFilterTags(fixture);
+        const tag = getTagButtons(tags[0]);
+
+        filterField.focus();
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(tag.label);
+      }));
+
+      it('should keep focus on first editButton. Focus: Input -> LEFT_ARROW x2', fakeAsync(() => {
+        const autocompleteFilter = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        filterField.filters = [autocompleteFilter];
+        filterField.tagData[0].deletable = false;
+        fixture.detectChanges();
+
+        const inputEl = getInput(fixture);
+        const tags = getFilterTags(fixture);
+        const tag = getTagButtons(tags[0]);
+
+        filterField.focus();
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tag.label, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(tag.label);
+      }));
+
+      it('should focus second editButton. Focus: Input -> LEFT_ARROW x2', fakeAsync(() => {
+        const autocompleteFilterUA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        const autocompleteFilterLA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[1],
+        ];
+        filterField.filters = [
+          [...autocompleteFilterUA],
+          [...autocompleteFilterLA],
+        ];
+        filterField.tagData[0].deletable = false;
+        filterField.tagData[1].deletable = false;
+        fixture.detectChanges();
+
+        const inputEl = getInput(fixture);
+        const tags = getFilterTags(fixture);
+        const tagUA = getTagButtons(tags[0]);
+        const tagLA = getTagButtons(tags[1]);
+
+        filterField.focus();
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tagUA.label, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(tagLA.label);
+      }));
+
+      it('should focus input element. Focus: Input -> LEFT_ARROW -> RIGHT_ARROW', fakeAsync(() => {
+        const autocompleteFilter = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        filterField.filters = [autocompleteFilter];
+        filterField.tagData[0].deletable = false;
+        fixture.detectChanges();
+
+        const inputEl = getInput(fixture);
+        const tags = getFilterTags(fixture);
+        const tag = getTagButtons(tags[0]);
+
+        filterField.focus();
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(tag.label, 'keyup', RIGHT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(inputEl);
+      }));
+
+      it('should focus input element. Focus: Input -> LEFT_ARROW x2 -> RIGHT_ARROW x2', fakeAsync(() => {
+        const autocompleteFilterUA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[0],
+        ];
+        const autocompleteFilterLA = [
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0],
+          TEST_DATA_KEYBOARD_NAVIGATION.autocomplete[0].autocomplete[1],
+        ];
+        filterField.filters = [
+          [...autocompleteFilterUA],
+          [...autocompleteFilterLA],
+        ];
+        filterField.tagData[0].deletable = false;
+        filterField.tagData[1].deletable = false;
+        fixture.detectChanges();
+
+        const inputEl = getInput(fixture);
+        const tags = getFilterTags(fixture);
+        const firstTag = getTagButtons(tags[0]);
+        const secondTag = getTagButtons(tags[1]);
+
+        filterField.focus();
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(inputEl, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(firstTag.label, 'keyup', LEFT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(secondTag.label, 'keyup', RIGHT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        dispatchKeyboardEvent(firstTag.label, 'keyup', RIGHT_ARROW);
+        tick();
+        fixture.detectChanges();
+
+        expect(document.activeElement).toBe(inputEl);
+      }));
+    });
+  });
+
   describe('overlay', () => {
     it('should create an autocomplete overlay when focus is called for autocomplete data', () => {
       filterField.focus();
       fixture.detectChanges();
       expect(overlayContainerElement).toBeDefined();
     });
+  });
+
+  describe('interaction state', () => {
+    it('should emit true when focused', fakeAsync(() => {
+      fixture.componentInstance.dataSource.data = FILTER_FIELD_TEST_DATA;
+      fixture.detectChanges();
+
+      filterField.focus();
+      advanceFilterfieldCycle();
+
+      expect(filterField.interactionState).toBeTruthy();
+    }));
+
+    it('should emit true when the filterField is focused', fakeAsync(() => {
+      fixture.componentInstance.dataSource.data = TEST_DATA_RANGE;
+      fixture.detectChanges();
+
+      const spy = jest.fn();
+      const subscription = filterField.interactionStateChange.subscribe(spy);
+
+      filterField.focus();
+      advanceFilterfieldCycle();
+
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      subscription.unsubscribe();
+    }));
   });
 
   describe('with autocomplete', () => {
@@ -268,7 +655,7 @@ describe('DtFilterField', () => {
       expect(filterField._autocomplete.isOpen).toBe(true);
     });
 
-    it('should emit the inputChange event when typing into the input field with autocomplete', fakeAsync(() => {
+    it('should emit the inputChange event when typing into the input field with autocomplete', () => {
       const spy = jest.fn();
       const subscription = filterField.inputChange.subscribe(spy);
 
@@ -282,7 +669,7 @@ describe('DtFilterField', () => {
 
       expect(spy).toHaveBeenCalledWith('xy');
       subscription.unsubscribe();
-    }));
+    });
 
     it('should create the correct options and option groups', () => {
       filterField.focus();
@@ -493,7 +880,7 @@ describe('DtFilterField', () => {
       sub.unsubscribe();
     }));
 
-    it('should switch to free text and on enter fire a filterChanges event and create a tag', fakeAsync(() => {
+    it('should switch to free text and on enter fire a filterChanges event and create a tag', () => {
       const spy = jest.fn();
       const subscription = filterField.filterChanges.subscribe(spy);
       filterField.focus();
@@ -507,7 +894,6 @@ describe('DtFilterField', () => {
       const inputEl = getInput(fixture);
       dispatchKeyboardEvent(inputEl, 'keydown', ENTER);
 
-      tick(DT_FILTER_FIELD_TYPING_DEBOUNCE);
       fixture.detectChanges();
 
       const tags = getFilterTags(fixture);
@@ -517,9 +903,9 @@ describe('DtFilterField', () => {
       expect(tags[0].value).toBe('abc');
       expect(spy).toHaveBeenCalledTimes(1);
       subscription.unsubscribe();
-    }));
+    });
 
-    it('should switch to free text with keyboard interaction and on enter fire a filterChanges event and create a tag', fakeAsync(() => {
+    it('should switch to free text with keyboard interaction and on enter fire a filterChanges event and create a tag', () => {
       const spy = jest.fn();
       const subscription = filterField.filterChanges.subscribe(spy);
       filterField.focus();
@@ -540,7 +926,6 @@ describe('DtFilterField', () => {
 
       dispatchKeyboardEvent(inputEl, 'keydown', ENTER);
 
-      tick(DT_FILTER_FIELD_TYPING_DEBOUNCE);
       fixture.detectChanges();
 
       const tags = getFilterTags(fixture);
@@ -551,7 +936,7 @@ describe('DtFilterField', () => {
       expect(tags[0].value).toBe('abc');
       expect(spy).toHaveBeenCalledTimes(1);
       subscription.unsubscribe();
-    }));
+    });
 
     it('should fire currentFilterChanges when an option is selected', fakeAsync(() => {
       const spy = jest.fn();
@@ -786,45 +1171,6 @@ describe('DtFilterField', () => {
       expect(options[3].textContent).toContain('St. Gallen');
     }));
 
-    it('should have the correct prefix when a filter is set and gets deleted in flight', () => {
-      filterField.focus();
-      advanceFilterfieldCycle();
-
-      // Set a filter first
-      getAndClickOption(overlayContainerElement, 1);
-      advanceFilterfieldCycle();
-      getAndClickOption(overlayContainerElement, 0);
-      advanceFilterfieldCycle();
-
-      // Get in flight of the next filter
-      getAndClickOption(overlayContainerElement, 0);
-      advanceFilterfieldCycle();
-
-      let category = fixture.debugElement.query(
-        By.css('.dt-filter-field-category'),
-      );
-      expect(category.nativeElement.textContent.trim()).toEqual('AUT');
-
-      // While in flight, delete the first tag
-      const tags = getFilterTags(fixture);
-      const { deleteButton } = getTagButtons(tags[0]);
-      deleteButton.click();
-      advanceFilterfieldCycle();
-
-      // Expect the category to still be there.
-      category = fixture.debugElement.query(
-        By.css('.dt-filter-field-category'),
-      );
-      expect(category).not.toBe(null);
-      expect(category.nativeElement.textContent.trim()).toEqual('AUT');
-
-      // Expect the options to be the same.
-      const options = getOptions(overlayContainerElement);
-      expect(options).toHaveLength(2);
-      expect(options[0].textContent).toContain('Upper Austria');
-      expect(options[1].textContent).toContain('Vienna');
-    });
-
     it('should mark the input as readonly while loading async data', () => {
       const DATA = {
         autocomplete: [
@@ -866,6 +1212,38 @@ describe('DtFilterField', () => {
       // readonly should be removed after the async data is loaded
       expect(input.readOnly).toBeFalsy();
     });
+  });
+
+  describe('default search', () => {
+    it('should not show the default search option when it is unique and used', fakeAsync(() => {
+      fixture.componentInstance.dataSource.data = TEST_DEFAULT_SEARCH_UNIQUE;
+      fixture.detectChanges();
+      advanceFilterfieldCycle();
+
+      filterField.focus();
+      advanceFilterfieldCycle();
+
+      let options = getOptions(overlayContainerElement);
+      expect(options[0].innerHTML.includes('DE')).toBeTruthy();
+
+      options[0].click();
+      advanceFilterfieldCycle();
+
+      options = getOptions(overlayContainerElement);
+
+      zone.simulateZoneExit();
+
+      options[0].click();
+      advanceFilterfieldCycle();
+
+      expect(filterField.filters.length).toBe(1);
+
+      options = getOptions(overlayContainerElement);
+
+      zone.simulateZoneExit();
+
+      expect(options[0].innerHTML.includes('DE')).toBeFalsy();
+    }));
   });
 
   describe('programmatic setting', () => {
@@ -1218,9 +1596,8 @@ describe('DtFilterField', () => {
       tagInst!.disabled = true;
       fixture.detectChanges();
       const tags = getFilterTags(fixture);
-      const { label, deleteButton } = getTagButtons(tags[0]);
+      const { label } = getTagButtons(tags[0]);
       expect(label.disabled).toBeTruthy();
-      expect(deleteButton).toBeNull();
     });
 
     it('should keep the deletable/editable flags on the tags when a tag is edited', () => {
@@ -1319,18 +1696,24 @@ describe('DtFilterField', () => {
 
   describe('data-source switching', () => {
     it('should cancel the edit mode if the data source is switched', () => {
+      filterField.filters = [
+        [
+          FILTER_FIELD_TEST_DATA_ASYNC.autocomplete[0], // AUT
+          (FILTER_FIELD_TEST_DATA_ASYNC.autocomplete[0] as any).autocomplete[1], // Vienna
+        ],
+      ];
       filterField.focus();
       advanceFilterfieldCycle();
 
       const options = getOptions(overlayContainerElement);
-      options[0].click();
+      options[1].click(); // USA
       advanceFilterfieldCycle();
 
       let category = fixture.debugElement.query(
         By.css('.dt-filter-field-category'),
       );
 
-      expect(category.nativeElement.textContent.trim()).toBe('AUT');
+      expect(category.nativeElement.textContent.trim()).toBe('USA');
       expect(filterField.filters.length).toBe(1);
       expect(filterField.filters[0][0].name).toBe('AUT');
 
@@ -1342,7 +1725,7 @@ describe('DtFilterField', () => {
       );
 
       expect(category).toBeNull();
-      expect(filterField.filters.length).toBe(0);
+      expect(filterField.filters.length).toBe(1);
     });
 
     it('should not remove the current filter if the data is changed when the filterChanges event fires', () => {
@@ -1547,6 +1930,99 @@ describe('DtFilterField', () => {
       expect(filterTags[0].key).toBe('AUT.Upper Austria');
       expect(filterTags[0].separator).toBe(':');
       expect(filterTags[0].value).toBe('Wels');
+    });
+  });
+
+  describe('placeholder parse label', () => {
+    let fixtureCustom: ComponentFixture<TestAppCustomParserInput>;
+    const placeholderElement = By.css('.dt-filter-field-infix');
+    const selectFields = () => {
+      filterField.focus();
+      fixtureCustom.detectChanges();
+      // Open first level
+      const firstLevel = getOptions(overlayContainerElement);
+      firstLevel[0].click();
+      advanceFilterfieldCycle();
+      tick();
+
+      // Open second level
+      const secondLevel = getOptions(overlayContainerElement);
+      secondLevel[0].click();
+      advanceFilterfieldCycle();
+
+      // Open third level
+      const thirdLevel = getOptions(overlayContainerElement);
+      thirdLevel[0].click();
+      advanceFilterfieldCycle();
+    };
+
+    beforeEach(() => {
+      fixtureCustom = createComponent(TestAppCustomParserInput);
+      filterField = fixtureCustom.debugElement.query(
+        By.directive(DtFilterField),
+      ).componentInstance;
+
+      fixtureCustom.componentInstance.dataSource.data = TEST_DATA_PLACEHOLDER;
+      advanceFilterfieldCycle();
+
+      fixtureCustom.detectChanges();
+    });
+    it('should display a default (first iterator) value when placeholder is not overwritten', fakeAsync(() => {
+      selectFields();
+
+      const placeholder = (fixtureCustom.debugElement.query(placeholderElement)
+        ?.nativeElement as HTMLDivElement)?.textContent;
+      expect(placeholder).toBe(TEST_DATA_PLACEHOLDER.autocomplete[0].name);
+    }));
+    it('should display a correct value when placeholder is overwrite by input', fakeAsync(() => {
+      const parser: EditionParserFunction | null = (
+        _filterValues: DtFilterValue[],
+      ) =>
+        _filterValues
+          ?.map(({ option }: DtAutocompleteValue<string>) => option.viewValue)
+          .join('.');
+
+      filterField.customEditionParser = parser;
+
+      selectFields();
+
+      const placeholder = (fixtureCustom.debugElement.query(placeholderElement)
+        ?.nativeElement as HTMLDivElement)?.textContent;
+      expect(placeholder).toBe('Locations.Linz');
+    }));
+  });
+  describe('filters public api', () => {
+    beforeEach(() => {
+      fixture.componentInstance.dataSource.data = TEST_DATA_EDITMODE;
+      advanceFilterfieldCycle();
+      fixture.detectChanges();
+    });
+
+    it('should not contain filters currently edited', () => {
+      const autocompleteFilter = [
+        TEST_DATA_EDITMODE.autocomplete[0], // AUT
+        (TEST_DATA_EDITMODE as any).autocomplete[0].autocomplete[1], // Vienna
+      ];
+      filterField.filters = [autocompleteFilter];
+
+      fixture.detectChanges();
+
+      expect(filterField.filters.length).toBe(1);
+
+      const tags = getFilterTags(fixture);
+      const { label: freeTextLabel } = getTagButtons(tags[0]);
+
+      // enter editmode
+      freeTextLabel.click();
+      advanceFilterfieldCycle();
+
+      expect(filterField.filters.length).toBe(0);
+
+      // cancel editmode
+      dispatchFakeEvent(document, 'click');
+      advanceFilterfieldCycle();
+
+      expect(filterField.filters.length).toBe(1);
     });
   });
 });

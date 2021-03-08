@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,9 +39,9 @@ export interface DtTableSelectionConfig {
 }
 
 /** Injectiontoken used to the DtTableSelection configuration */
-export const DT_TABLE_SELECTION_CONFIG = new InjectionToken<
-  DtTableSelectionConfig
->('DT_TABLE_SELECTION_CONFIG');
+export const DT_TABLE_SELECTION_CONFIG = new InjectionToken<DtTableSelectionConfig>(
+  'DT_TABLE_SELECTION_CONFIG',
+);
 
 /**
  * Directive for managing selection on a DtTable component

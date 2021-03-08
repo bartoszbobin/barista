@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,7 +114,7 @@ test('Should throw an error when the github status is not successful', async () 
   const octokitApi = new Octokit();
   jest
     .spyOn(octokitApi.repos, 'getCombinedStatusForRef')
-    .mockImplementation(() => Promise.resolve(errorResponse));
+    .mockImplementation(() => Promise.resolve(errorResponse as any));
 
   expect.assertions(1);
 

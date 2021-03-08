@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,7 @@ import {
 } from './state/selectors';
 import { createQuickFilterStore, QuickFilterState } from './state/store';
 import { DtDrawer } from '@dynatrace/barista-components/drawer';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 
 /** Directive that is used to place a title inside the quick filters sidebar */
 @Directive({
@@ -133,9 +133,8 @@ export class DtQuickFilter<T = any> implements AfterViewInit, OnDestroy {
    * Emits a boolean value for the open state (true for open, false for close).
    * Fires after the animation is completed.
    */
-  @Output() readonly sidebarOpenChange: Observable<
-    boolean
-  > = this._zone.onStable.pipe(
+  @Output()
+  readonly sidebarOpenChange: Observable<boolean> = this._zone.onStable.pipe(
     take(1),
     switchMap(() => this._drawer.openChange.asObservable()),
   );
@@ -166,6 +165,7 @@ export class DtQuickFilter<T = any> implements AfterViewInit, OnDestroy {
     this._sidebarOpened = coerceBooleanProperty(value);
   }
   _sidebarOpened = true;
+  static ngAcceptInputType_sidebarOpened: BooleanInput;
 
   /**
    * Label for the filter field (e.g. "Filter by").

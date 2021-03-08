@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,10 +20,13 @@ import { DtInputModule } from '@dynatrace/barista-components/input';
 import { DtExampleFilterFieldAsync } from './filter-field-async-example/filter-field-async-example';
 import { DtExampleFilterFieldClearall } from './filter-field-clearall-example/filter-field-clearall-example';
 import { DtExampleFilterFieldCustomParser } from './filter-field-custom-parser-example/filter-field-custom-parser-example';
+import { DtExampleFilterFieldCustomPlaceholder } from './filter-field-custom-placeholder/filter-field-custom-placeholder.example';
 import { DtExampleFilterFieldDefault } from './filter-field-default-example/filter-field-default-example';
+import { DtExampleFilterFieldDefaultSearch } from './filter-field-default-search-example/filter-field-default-search-example';
 import { DtExampleFilterFieldDisabled } from './filter-field-disabled-example/filter-field-disabled-example';
 import { DtExampleFilterFieldDistinct } from './filter-field-distinct-example/filter-field-distinct-example';
 import { DtExampleFilterFieldInfiniteDataDepth } from './filter-field-infinite-data-depth-example/filter-field-infinite-data-depth-example';
+import { DtExampleFilterFieldMultiSelect } from './filter-field-multi-select-example/filter-field-multi-select-example';
 import { DtExampleFilterFieldPartial } from './filter-field-partial-example/filter-field-partial-example';
 import { DtExampleFilterFieldProgrammaticFilters } from './filter-field-programmatic-filters-example/filter-field-programmatic-filters-example';
 import { DtExampleFilterFieldReadOnlyTags } from './filter-field-readonly-non-editable-tags-example/filter-field-readonly-non-editable-tags-example';
@@ -36,7 +39,9 @@ import { DtExampleFilterFieldValidator } from './filter-field-validator-example/
     DtExampleFilterFieldAsync,
     DtExampleFilterFieldClearall,
     DtExampleFilterFieldCustomParser,
+    DtExampleFilterFieldCustomPlaceholder,
     DtExampleFilterFieldDefault,
+    DtExampleFilterFieldDefaultSearch,
     DtExampleFilterFieldDistinct,
     DtExampleFilterFieldInfiniteDataDepth,
     DtExampleFilterFieldPartial,
@@ -45,6 +50,7 @@ import { DtExampleFilterFieldValidator } from './filter-field-validator-example/
     DtExampleFilterFieldReadOnlyTags,
     DtExampleFilterFieldUnique,
     DtExampleFilterFieldValidator,
+    DtExampleFilterFieldMultiSelect,
   ],
 })
 export class DtFilterFieldExamplesModule {}

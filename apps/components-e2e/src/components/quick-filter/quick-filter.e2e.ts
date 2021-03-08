@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -329,7 +329,6 @@ test('should work with async data and handle distincts correctly', async (testCo
   await clickOption(2);
   // Click option Los Angeles
   await clickOption(2);
-
   // Expect the filter to be set
   await testController
     .expect(getFilterfieldTags())
@@ -348,4 +347,26 @@ test('should work with async data and handle distincts correctly', async (testCo
     .expect(options.nth(1).textContent)
     // textContent is duplicated because of the highlight within the option
     .eql('GrazGraz');
+});
+
+fixture('Quick Filter check Show More functionality')
+  .page('http://localhost:4200/quick-filter/show-more')
+  .beforeEach(async () => {
+    await resetWindowSizeToDefault();
+    await waitForAngular();
+  });
+
+test('should render the correct number or checkboxes', async (testController: TestController) => {
+  await testController
+    .expect(getShowMoreText('Country'))
+    .eql('There are 2 States available')
+    .expect(getGroupItems('Country').count)
+    .eql(4)
+    .click(getShowMoreButton('Country'))
+    .expect(getGroupItems('Country').count)
+    .eql(6)
+    .click(getGroupItem('Country', 'State 5'))
+    .click(quickFilterBackButton)
+    .expect(getGroupItems('Country').count)
+    .eql(5);
 });

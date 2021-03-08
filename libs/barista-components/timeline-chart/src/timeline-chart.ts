@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceNumberProperty } from '@angular/cdk/coercion';
+import { coerceNumberProperty, NumberInput } from '@angular/cdk/coercion';
 import {
   AfterContentInit,
   ChangeDetectionStrategy,
@@ -69,6 +69,7 @@ export class DtTimelineChart implements AfterContentInit, OnDestroy {
     this._updateRenderValues();
   }
   private _value = 0;
+  static ngAcceptInputType_value: NumberInput;
 
   /** @internal The timing markers passed in via ng-content. */
   @ContentChildren(DtTimelineChartTimingMarker)

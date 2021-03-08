@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -75,23 +75,25 @@ export class DtExpandableText extends _ExpandableTextBase implements HasId {
       this._changeDetectorRef.markForCheck();
     }
   }
-
   private _expanded = false;
+  static ngAcceptInputType_expanded: BooleanInput;
 
   /** Event emitted when state changes */
   @Output() readonly expandChanged = new EventEmitter<boolean>();
 
   /** @internal Event emitted when text is expanded */
   // tslint:disable-next-line: dt-annotate-internal-fields
-  @Output('expanded') readonly _textExpanded: Observable<
-    boolean
-  > = this.expandChanged.pipe(filter((v) => v));
+  @Output('expanded')
+  readonly _textExpanded: Observable<boolean> = this.expandChanged.pipe(
+    filter((v) => v),
+  );
 
   /** @internal Event emitted when text is collapsed */
   // tslint:disable-next-line: dt-annotate-internal-fields
-  @Output('collapsed') readonly _textCollapsed: Observable<
-    boolean
-  > = this.expandChanged.pipe(filter((v) => !v));
+  @Output('collapsed')
+  readonly _textCollapsed: Observable<boolean> = this.expandChanged.pipe(
+    filter((v) => !v),
+  );
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {
     super();

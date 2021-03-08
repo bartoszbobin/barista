@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,24 +19,31 @@ import {
   ChangeDetectorRef,
   Component,
   ContentChild,
+  ElementRef,
   EventEmitter,
   Input,
   NgZone,
   OnDestroy,
+  OnInit,
   Optional,
   Output,
+  QueryList,
   SkipSelf,
   TemplateRef,
   ViewChild,
+  ViewChildren,
   ViewEncapsulation,
 } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
-import { DtViewportResizer } from '@dynatrace/barista-components/core';
+import {
+  DtViewportResizer,
+  isDefined,
+} from '@dynatrace/barista-components/core';
 import { formatCount } from '@dynatrace/barista-components/formatters';
 import { DtColors, DtTheme } from '@dynatrace/barista-components/theming';
 import { scaleLinear } from 'd3-scale';
 import { merge, Subject } from 'rxjs';
-import { first, switchMapTo, takeUntil } from 'rxjs/operators';
+import { first, tap, switchMapTo, takeUntil } from 'rxjs/operators';
 import { DtStackedSeriesChartNode } from '..';
 import { DtStackedSeriesChartOverlay } from './stacked-series-chart-overlay.directive';
 import {
@@ -47,13 +54,22 @@ import {
   DtStackedSeriesChartSeries,
   DtStackedSeriesChartTooltipData,
   DtStackedSeriesChartValueDisplayMode,
+  DtStackedSeriesChartSelectionMode,
+  DtStackedSeriesChartSelection,
   fillSeries,
   getLegends,
   getSeriesWithState,
   getTotalMaxValue,
   updateNodesVisibility,
+  DtStackedSeriesChartLabelAxisMode,
 } from './stacked-series-chart.util';
 import { DtOverlayRef, DtOverlay } from '@dynatrace/barista-components/overlay';
+import {
+  coerceBooleanProperty,
+  coerceNumberProperty,
+  NumberInput,
+  BooleanInput,
+} from '@angular/cdk/coercion';
 
 // horizontal ticks
 const TICK_BAR_SPACING = 160;
@@ -77,9 +93,10 @@ const TICK_COLUMN_SPACING = 80;
     '[class.dt-stacked-series-chart-with-value-axis]': 'visibleValueAxis',
     '[class.dt-stacked-series-chart-bar]': "mode === 'bar'",
     '[class.dt-stacked-series-chart-column]': "mode === 'column'",
+    '[style.--dt-stacked-series-chart-grid-gap]': '_gridGap',
   },
 })
-export class DtStackedSeriesChart implements OnDestroy {
+export class DtStackedSeriesChart implements OnDestroy, OnInit {
   /** Array of series with their nodes. */
   @Input()
   get series(): DtStackedSeriesChartSeries[] {
@@ -96,6 +113,17 @@ export class DtStackedSeriesChart implements OnDestroy {
   /** Series with filled nodes */
   private _filledSeries: DtStackedSeriesChartFilledSeries[];
 
+  /** Whether to make just the nodes selectable or the whole row/column */
+  @Input() selectionMode: DtStackedSeriesChartSelectionMode = 'node';
+
+  get _isNodeSelectionMode(): boolean {
+    return this.selectionMode === 'node';
+  }
+
+  get _isStackSelectionMode(): boolean {
+    return this.selectionMode === 'stack';
+  }
+
   /** Allow selections to be made on chart */
   @Input()
   get selectable(): boolean {
@@ -104,10 +132,11 @@ export class DtStackedSeriesChart implements OnDestroy {
   set selectable(value: boolean) {
     if (value !== this._selectable) {
       this._toggleSelect();
-      this._selectable = value ?? false;
+      this._selectable = coerceBooleanProperty(value) ?? false;
     }
   }
   _selectable: boolean = false;
+  static ngAcceptInputType_selectable: BooleanInput;
 
   /** Max value in the chart */
   @Input()
@@ -116,11 +145,12 @@ export class DtStackedSeriesChart implements OnDestroy {
   }
   set max(value: number | undefined) {
     if (value !== this._max) {
-      this._max = value;
+      this._max = isDefined(value) ? coerceNumberProperty(value) : value;
       this._render();
     }
   }
   private _max: number | undefined;
+  static ngAcceptInputType_max: NumberInput;
 
   /** Whether each bar should be filled completely or should take into account their siblings and max  */
   @Input()
@@ -162,13 +192,37 @@ export class DtStackedSeriesChart implements OnDestroy {
   _legends: DtStackedSeriesChartLegend[];
 
   /** Visibility of the legend */
-  @Input() visibleLegend: boolean = true;
+  @Input()
+  get visibleLegend(): boolean {
+    return this._visibleLegend;
+  }
+  set visibleLegend(value: boolean) {
+    this._visibleLegend = coerceBooleanProperty(value);
+  }
+  private _visibleLegend = true;
+  static ngAcceptInputType_visibleLegend: BooleanInput;
 
   /** Whether background should be transparent or show a background. Default: true */
-  @Input() visibleTrackBackground: boolean = true;
+  @Input()
+  get visibleTrackBackground(): boolean {
+    return this._visibleTrackBackground;
+  }
+  set visibleTrackBackground(value: boolean) {
+    this._visibleTrackBackground = coerceBooleanProperty(value);
+  }
+  private _visibleTrackBackground = true;
+  static ngAcceptInputType_visibleTrackBackground: BooleanInput;
 
   /** Visibility of series label */
-  @Input() visibleLabel: boolean = true;
+  @Input()
+  get visibleLabel(): boolean {
+    return this._visibleLabel;
+  }
+  set visibleLabel(value: boolean) {
+    this._visibleLabel = coerceBooleanProperty(value);
+  }
+  private _visibleLabel = true;
+  static ngAcceptInputType_visibleLabel: BooleanInput;
 
   /** Display mode */
   @Input()
@@ -185,10 +239,26 @@ export class DtStackedSeriesChart implements OnDestroy {
   _mode: DtStackedSeriesChartMode = 'bar';
 
   /** Maximum size of the track */
-  @Input() maxTrackSize: number = 16;
+  @Input()
+  get maxTrackSize(): number {
+    return this._maxTrackSize;
+  }
+  set maxTrackSize(value: number) {
+    this._maxTrackSize = coerceNumberProperty(value);
+  }
+  private _maxTrackSize = 16;
+  static ngAcceptInputType_maxTrackSize: NumberInput;
 
   /** Visibility of value axis */
-  @Input() visibleValueAxis: boolean = true;
+  @Input()
+  get visibleValueAxis(): boolean {
+    return this._visibleValueAxis;
+  }
+  set visibleValueAxis(value: boolean) {
+    this._visibleValueAxis = coerceBooleanProperty(value);
+  }
+  private _visibleValueAxis = true;
+  static ngAcceptInputType_visibleValueAxis: BooleanInput;
 
   /** @internal Ticks for value axis */
   _axisTicks: { pos: number; value: number; valueRelative: number }[] = [];
@@ -199,26 +269,36 @@ export class DtStackedSeriesChart implements OnDestroy {
     relative: 0,
   };
 
+  /** Whether to show the label axis rotated to fit more labels */
+  @Input() labelAxisMode: DtStackedSeriesChartLabelAxisMode = 'full';
+  /** @internal  Support only for mode === 'column', wouldn't make sense for 'row' */
+  get _labelAxisCompactModeEnabled(): boolean {
+    return (
+      this.mode === 'column' &&
+      (this.labelAxisMode === 'compact' ||
+        (this.labelAxisMode === 'auto' && this._isAnyLabelOverflowing()))
+    );
+  }
+
+  /** Gap between cells in the grid */
+  _gridGap = 16;
+
   /** Current selection [series, node] */
   @Input()
-  get selected(): [DtStackedSeriesChartSeries, DtStackedSeriesChartNode] | [] {
+  get selected(): DtStackedSeriesChartSelection | [] {
     return this._selected;
   }
-  set selected([series, node]:
-    | [DtStackedSeriesChartSeries, DtStackedSeriesChartNode]
-    | []) {
-    // if selected node is different than current
-    if (this._selected[1] !== node) {
+  set selected([series, node]: DtStackedSeriesChartSelection | []) {
+    // if selected node or series are different than current
+    if (this._selected[0] !== series || this._selected[1] !== node) {
       this._toggleSelect(series, node);
     }
   }
-  private _selected:
-    | [DtStackedSeriesChartSeries, DtStackedSeriesChartNode]
-    | [] = [];
+  private _selected: DtStackedSeriesChartSelection | [] = [];
 
   /** Event that fires when a node is clicked with an array of [series, node]  */
   @Output() selectedChange: EventEmitter<
-    [DtStackedSeriesChartSeries, DtStackedSeriesChartNode] | []
+    DtStackedSeriesChartSelection | []
   > = new EventEmitter();
 
   /** @internal Template reference for the DtStackedSeriesChart */
@@ -226,7 +306,13 @@ export class DtStackedSeriesChart implements OnDestroy {
   _overlay: TemplateRef<DtStackedSeriesChartTooltipData>;
 
   /** @internal Reference to the root svgElement. */
-  @ViewChild('valueAxis') _valueAxis;
+  @ViewChild('valueAxis') _valueAxis: ElementRef;
+
+  /** @internal Reference to the root element. */
+  @ViewChild('chartContainer') _chartContainer: ElementRef;
+
+  /** @internal Reference to the elements on the label axis. */
+  @ViewChildren('label') labels: QueryList<ElementRef>;
 
   /** Reference to the open overlay. */
   private _overlayRef: DtOverlayRef<DtStackedSeriesChartTooltipData> | null;
@@ -251,7 +337,9 @@ export class DtStackedSeriesChart implements OnDestroy {
      */
     private readonly _sanitizer: DomSanitizer,
     @Optional() @SkipSelf() private readonly _theme: DtTheme,
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     if (this._theme) {
       this._theme._stateChanges
         .pipe(takeUntil(this._destroy$))
@@ -264,6 +352,13 @@ export class DtStackedSeriesChart implements OnDestroy {
 
     merge(this._shouldUpdateTicks, this._resizer.change())
       .pipe(
+        tap(() => {
+          if (this.labelAxisMode === 'auto' && this.mode === 'column') {
+            // Recalculate every time the size changes only if we are on these modes
+            this._isAnyLabelOverflowing();
+            this._changeDetectorRef.detectChanges();
+          }
+        }),
         // Shift the updating/rendering to the next CD cycle,
         // because we need the dimensions of axis first, which is rendered in the main cycle.
         switchMapTo(this._zone.onStable.pipe(first())),
@@ -292,7 +387,13 @@ export class DtStackedSeriesChart implements OnDestroy {
     node?: DtStackedSeriesChartNode,
   ): void {
     if (this._selectable) {
-      if (series && node && this._selected[1] !== node) {
+      if (
+        // Toggle if node or stack are different from current selection
+        series &&
+        (!this._selected[0] ||
+          (this._selected[0] && series.label !== this._selected[0].label) ||
+          this._selected[1] !== node)
+      ) {
         this._selected = [series, node];
       } else {
         this._selected = [];
@@ -303,6 +404,17 @@ export class DtStackedSeriesChart implements OnDestroy {
     } else {
       this._selected = [];
     }
+  }
+
+  _toggleStackSelect(series?: DtStackedSeriesChartSeries): false | void {
+    return this._isStackSelectionMode && this._toggleSelect(series, undefined);
+  }
+
+  _toggleNodeSelect(
+    series?: DtStackedSeriesChartSeries,
+    node?: DtStackedSeriesChartNode,
+  ): false | void {
+    return this._isNodeSelectionMode && this._toggleSelect(series, node);
   }
 
   /** @internal Toggle the visibility of an element */
@@ -347,9 +459,10 @@ export class DtStackedSeriesChart implements OnDestroy {
     slice: DtStackedSeriesChartTooltipData,
   ): void {
     if (this._overlay && !this._overlayRef) {
-      this._overlayRef = this._overlayService.create<
-        DtStackedSeriesChartTooltipData
-      >(event.target as HTMLElement, this._overlay);
+      this._overlayRef = this._overlayService.create<DtStackedSeriesChartTooltipData>(
+        event.target as HTMLElement,
+        this._overlay,
+      );
       this._overlayRef.updateImplicitContext(slice);
       this._overlayRef.updatePosition(event.offsetX, event.offsetY);
     }
@@ -434,5 +547,28 @@ export class DtStackedSeriesChart implements OnDestroy {
           1.5,
       };
     }
+  }
+  /** Return the width in px of the longest label on the label axis */
+  private _getLongestLabelWidth(): number {
+    return this.labels.reduce((labelCount: number, label: ElementRef) => {
+      return label.nativeElement.scrollWidth > labelCount
+        ? label.nativeElement.scrollWidth
+        : labelCount;
+    }, 0);
+  }
+
+  /** Whether there's a label on the label axis that is overflowing its allocated space on the css grid */
+  private _isAnyLabelOverflowing(): boolean {
+    if (
+      !this.labels ||
+      !this.series?.length ||
+      !this._chartContainer?.nativeElement
+    )
+      return false;
+    return (
+      this._getLongestLabelWidth() >
+      this._chartContainer.nativeElement.offsetWidth / this.series.length -
+        this._gridGap
+    );
   }
 }

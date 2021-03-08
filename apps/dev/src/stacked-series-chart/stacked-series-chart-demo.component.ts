@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@ import {
   DtStackedSeriesChartFillMode,
   DtStackedSeriesChartMode,
   DtStackedSeriesChartNode,
+  DtStackedSeriesChartSelectionMode,
   DtStackedSeriesChartSeries,
   DtStackedSeriesChartValueDisplayMode,
 } from '@dynatrace/barista-components/stacked-series-chart';
@@ -30,8 +31,9 @@ import { stackedSeriesChartDemoData } from './stacked-series-chart-demo-data';
   styleUrls: ['./stacked-series-chart-demo.component.scss'],
 })
 export class StackedSeriesChartDemo {
+  selectionMode: DtStackedSeriesChartSelectionMode = 'node';
   selectable: boolean = true;
-  selected: [DtStackedSeriesChartSeries, DtStackedSeriesChartNode] = [
+  selected: [DtStackedSeriesChartSeries?, DtStackedSeriesChartNode?] = [
     stackedSeriesChartDemoData[3],
     stackedSeriesChartDemoData[3].nodes[1],
   ];
@@ -40,10 +42,11 @@ export class StackedSeriesChartDemo {
   visibleLegend: boolean = true;
   fillMode: DtStackedSeriesChartFillMode = 'relative';
   multiSeries = true;
-  mode: DtStackedSeriesChartMode = 'bar';
+  mode: DtStackedSeriesChartMode = 'column';
   maxTrackSize: number = 16;
   visibleTrackBackground: boolean = true;
   visibleValueAxis: boolean = true;
+  labelAxisMode = 'auto';
 
   series = stackedSeriesChartDemoData;
 
@@ -52,5 +55,9 @@ export class StackedSeriesChartDemo {
     this.series = multi
       ? stackedSeriesChartDemoData
       : [stackedSeriesChartDemoData[3]];
+  }
+
+  clearSelection(): void {
+    this.selected = [];
   }
 }

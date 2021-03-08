@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -76,6 +76,7 @@ export class DtExpandableSection
     this._changeDetectorRef.markForCheck();
   }
   private _expanded = false;
+  static ngAcceptInputType_expanded: BooleanInput;
 
   /** Whether the expandable section is disabled. */
   @Input()
@@ -87,19 +88,22 @@ export class DtExpandableSection
     this._changeDetectorRef.markForCheck();
   }
   private _disabled = false;
+  static ngAcceptInputType_disabled: BooleanInput;
 
   /** Event emitted when the section's expandable state changes. */
   @Output() readonly expandChange = new EventEmitter<boolean>();
 
   /** @internal Event emitted when the section is expanded. */
-  @Output('expanded') readonly _sectionExpanded: Observable<
-    boolean
-  > = this.expandChange.pipe(filter((v) => v));
+  @Output('expanded')
+  readonly _sectionExpanded: Observable<boolean> = this.expandChange.pipe(
+    filter((v) => v),
+  );
 
   /** @internal Event emitted when the section is collapsed. */
-  @Output('collapsed') readonly _sectionCollapsed: Observable<
-    boolean
-  > = this.expandChange.pipe(filter((v) => !v));
+  @Output('collapsed')
+  readonly _sectionCollapsed: Observable<boolean> = this.expandChange.pipe(
+    filter((v) => !v),
+  );
 
   constructor(private _changeDetectorRef: ChangeDetectorRef) {
     super();

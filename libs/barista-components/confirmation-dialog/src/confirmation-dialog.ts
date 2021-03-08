@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import {
@@ -127,6 +127,7 @@ export class DtConfirmationDialog
     this._showBackdrop = coerceBooleanProperty(value);
     this._updateBackdropVisibility();
   }
+  static ngAcceptInputType_showBackdrop: BooleanInput;
 
   /** Input for the current state of confirmation dialog, corresponding to which dt-confirmation-dialog state child to display. */
   @Input()

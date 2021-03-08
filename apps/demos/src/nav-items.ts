@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -316,6 +316,10 @@ export const DT_DEMOS_EXAMPLE_NAV_ITEMS = [
         route: '/combobox-simple-example',
       },
       {
+        name: 'combobox-form-control-example',
+        route: '/combobox-form-control-example',
+      },
+      {
         name: 'combobox-custom-option-height-example',
         route: '/combobox-custom-option-height-example',
       },
@@ -452,6 +456,10 @@ export const DT_DEMOS_EXAMPLE_NAV_ITEMS = [
       {
         name: 'calendar-min-max-example',
         route: '/calendar-min-max-example',
+      },
+      {
+        name: 'timepicker-min-max-example',
+        route: '/timepicker-min-max-example',
       },
     ],
   },
@@ -620,6 +628,10 @@ export const DT_DEMOS_EXAMPLE_NAV_ITEMS = [
       {
         name: 'filter-field-default-example',
         route: '/filter-field-default-example',
+      },
+      {
+        name: 'filter-field-default-search-example',
+        route: '/filter-field-default-search-example',
       },
       {
         name: 'filter-field-disabled-example',

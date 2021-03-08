@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { coerceBooleanProperty, BooleanInput } from '@angular/cdk/coercion';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -63,8 +63,11 @@ export const _DtSortHeaderMixinBase = mixinDisabled(DtSortHeaderBase);
   changeDetection: ChangeDetectionStrategy.OnPush,
   inputs: ['disabled'],
 })
-export class DtSortHeader extends _DtSortHeaderMixinBase
+export class DtSortHeader
+  extends _DtSortHeaderMixinBase
   implements CanDisable, OnDestroy, OnInit {
+  static ngAcceptInputType_disabled: BooleanInput;
+
   private _rerenderSubscription = Subscription.EMPTY;
 
   /**
@@ -88,6 +91,7 @@ export class DtSortHeader extends _DtSortHeaderMixinBase
     }
   }
   private _sortable = true;
+  static ngAcceptInputType_sortable: BooleanInput;
 
   /**
    * Overrides the sort start value of the containing DtSort

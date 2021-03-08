@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,6 @@ import {
 import { Schema as AngularJson } from '@angular/cli/lib/config/schema';
 import { writeFileSync } from 'fs';
 import { join, dirname, resolve } from 'path';
-import { NgPackagrBuilderOptions } from '@angular-devkit/build-ng-packagr';
 import { green } from 'chalk';
 import {
   NgPackagerJson,
@@ -53,9 +52,7 @@ export async function packager(
   let ngPackagrBuilderOptions;
   try {
     // Read the options of the build target options set up with the ng-packagr builder
-    ngPackagrBuilderOptions = ((await context.getTargetOptions(
-      target,
-    )) as unknown) as NgPackagrBuilderOptions;
+    ngPackagrBuilderOptions = (await context.getTargetOptions(target)) as any;
 
     if (ngPackagrBuilderOptions.project === undefined) {
       throw new Error(

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick,
   inject,
 } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -33,10 +32,7 @@ import {
 } from '@dynatrace/testing/browser';
 import { FILTER_FIELD_TEST_DATA_ASYNC } from '@dynatrace/testing/fixtures';
 import { defaultTagDataForFilterValuesParser } from '../filter-field-util';
-import {
-  DtFilterField,
-  DT_FILTER_FIELD_TYPING_DEBOUNCE,
-} from '../filter-field';
+import { DtFilterField } from '../filter-field';
 import { DT_FILTER_VALUES_PARSER_CONFIG } from '../filter-field-config';
 import { DtFilterFieldDefaultDataSource } from '../filter-field-default-data-source';
 import { DtFilterFieldModule } from '../filter-field-module';
@@ -130,13 +126,11 @@ export function setupFilterFieldTest(): FilterFieldTestContext {
   }
 
   /**
-   * Types the passed value into the filter field input element,
-   * waits for the debounce time.
+   * Types the passed value into the filter field input element
    */
   function typeIntoFilterElement(inputString: string): void {
     const inputEl = fixture!.debugElement.query(By.css('input')).nativeElement;
     typeInElement(inputString, inputEl);
-    tick(DT_FILTER_FIELD_TYPING_DEBOUNCE);
   }
 
   return {
@@ -289,12 +283,61 @@ export function getRangeApplyButton(
   );
 }
 
+export function getMultiSelectTrigger(
+  overlayContainerElement: HTMLElement,
+): HTMLElement[] {
+  return Array.from(
+    overlayContainerElement.querySelectorAll('input[dtFilterFieldMultiSelect]'),
+  );
+}
+
+export function getMultiSelect(
+  overlayContainerElement: HTMLElement,
+): HTMLElement[] {
+  return Array.from(
+    overlayContainerElement.querySelectorAll(
+      '.dt-filter-field-multi-select-panel',
+    ),
+  );
+}
+
+export function getMultiselectCheckboxLabels(
+  overlayContainerElement: HTMLElement,
+): HTMLInputElement[] {
+  return Array.from(
+    overlayContainerElement.querySelectorAll(
+      '.dt-filter-field-multi-select-checkbox label',
+    ),
+  );
+}
+
+export function getMultiselectCheckboxInputs(
+  overlayContainerElement: HTMLElement,
+): HTMLInputElement[] {
+  return Array.from(
+    overlayContainerElement.querySelectorAll(
+      '.dt-filter-field-multi-select-checkbox input',
+    ),
+  );
+}
+
+export function getMultiselectApplyButton(
+  overlayContainerElement: HTMLElement,
+): HTMLElement[] {
+  return Array.from(
+    overlayContainerElement.querySelectorAll(
+      '.dt-filter-field-multi-select-apply',
+    ),
+  );
+}
+
 interface FilterTagTestData {
   ele: DebugElement;
   key: string;
   separator: string;
   value: string;
   removeButton: HTMLElement;
+  deletable?: boolean;
 }
 
 // tslint:disable-next-line:no-any

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +15,6 @@
  */
 
 import { isDefined, isObject } from '@dynatrace/barista-components/core';
-
 import { getDtFilterFieldRangeNoOperatorsError } from './filter-field-errors';
 import { DtFilterFieldValidator } from './filter-field-validation';
 
@@ -27,8 +26,18 @@ export enum DtNodeFlags {
   TypeOption = 1 << 2,
   TypeGroup = 1 << 3,
   TypeRange = 1 << 4,
-  RenderTypes = TypeAutocomplete | TypeFreeText | TypeRange,
-  Types = TypeAutocomplete | TypeFreeText | TypeOption | TypeGroup,
+  TypeMultiSelect = 1 << 5,
+  RenderTypes = TypeAutocomplete | TypeFreeText | TypeRange | TypeMultiSelect,
+  Types = TypeAutocomplete |
+    TypeFreeText |
+    TypeOption |
+    TypeGroup |
+    TypeMultiSelect,
+}
+
+export interface DefaultSearchOption<T> {
+  defaultSearchDef: DtAutocompleteValue<T>;
+  inputValue: string;
 }
 
 export interface DtNodeDef<D = unknown> {
@@ -39,6 +48,7 @@ export interface DtNodeDef<D = unknown> {
   operator: DtOperatorDef | null;
   freeText: DtFreeTextDef | null;
   range: DtRangeDef | null;
+  multiSelect: DtMultiSelectDef | null;
   data: D;
 }
 
@@ -53,7 +63,16 @@ export interface DtAutocompleteDef<OpGr = unknown, Op = unknown> {
 export interface DtFreeTextDef<S = unknown> {
   suggestions: DtNodeDef<S>[];
   validators: DtFilterFieldValidator[];
+  async?: boolean;
   unique: boolean;
+  defaultSearch?: boolean;
+}
+
+export interface DtMultiSelectDef<MOpt = unknown, Opr = unknown> {
+  async: boolean;
+  partial?: boolean;
+  multiOptions: DtNodeDef<MOpt>[];
+  operators: DtNodeDef<Opr>[];
 }
 
 export interface DtGroupDef<O = unknown> {
@@ -150,6 +169,60 @@ export function isDtRangeDef<D = unknown>(
   return isDtNodeDef(def) && !!(def.nodeFlags & DtNodeFlags.TypeRange);
 }
 
+/** Creates a new DtMultiSelectDef onto a provided existing NodeDef or a newly created one. */
+export function dtMultiSelectDef<D = unknown, OG = unknown, Op = unknown>(
+  data: D,
+  existingNodeDef: DtNodeDef | null,
+  multiOptions: DtNodeDef<OG>[],
+  async: boolean,
+  partial: boolean = false,
+): DtNodeDef<D> & { multiSelect: DtMultiSelectDef<OG, Op> } {
+  const def = {
+    ...nodeDef(data, existingNodeDef),
+    multiSelect: { multiOptions, async, partial, operators: [] },
+  };
+  def.nodeFlags |= DtNodeFlags.TypeMultiSelect;
+  return def;
+}
+
+/** Whether the provided def object is of type NodeDef and consists of an MultiSelectDef. */
+export function isDtMultiSelectDef<D = unknown>(
+  def: DtNodeDef<D> | null,
+): def is DtNodeDef<D> & DtMultiSelectDef {
+  return isDtNodeDef(def) && !!(def.nodeFlags & DtNodeFlags.TypeMultiSelect);
+}
+
+export function isAsyncDtMultiSelectDef<D>(
+  def: DtNodeDef<D> | null,
+): def is DtNodeDef<D> & {
+  multiSelect: DtMultiSelectDef;
+  option: DtOptionDef;
+} {
+  return (
+    isDtMultiSelectDef<D>(def) &&
+    isDtOptionDef<D>(def) &&
+    Boolean(def.multiSelect?.async)
+  );
+}
+
+export function isPartialDtMultiSelectDef(
+  def: any,
+): def is DtNodeDef & {
+  multiSelect: DtMultiSelectDef;
+  option: DtOptionDef;
+} {
+  return (
+    isDtMultiSelectDef(def) && isDtOptionDef(def) && !!def.multiSelect?.partial
+  );
+}
+
+/** Whether the provided def object is an object and consists of a DefaultSearchDef */
+export function isDefaultSearchOption<T>(
+  option: any,
+): option is DefaultSearchOption<T> {
+  return isObject(option) && isDtAutocompleteValue(option.defaultSearchDef);
+}
+
 /** Creates a new DtAutocompleteDef onto a provided existing NodeDef or a newly created one. */
 export function dtAutocompleteDef<D = unknown, OG = unknown, Op = unknown>(
   data: D,
@@ -161,7 +234,13 @@ export function dtAutocompleteDef<D = unknown, OG = unknown, Op = unknown>(
 ): DtNodeDef<D> & { autocomplete: DtAutocompleteDef<OG, Op> } {
   const def = {
     ...nodeDef(data, existingNodeDef),
-    autocomplete: { optionsOrGroups, distinct, async, partial, operators: [] },
+    autocomplete: {
+      optionsOrGroups,
+      distinct,
+      async,
+      partial,
+      operators: [],
+    },
   };
   def.nodeFlags |= DtNodeFlags.TypeAutocomplete;
   return def;
@@ -261,10 +340,12 @@ export function dtFreeTextDef<D = unknown, S = unknown>(
   suggestions: DtNodeDef<S>[],
   validators: DtFilterFieldValidator[],
   unique: boolean,
+  defaultSearch: boolean = false,
+  async: boolean = false,
 ): DtNodeDef<D> & { freeText: DtFreeTextDef<S> } {
   const def = {
     ...nodeDef<D>(data, existingNodeDef),
-    freeText: { suggestions, validators, unique },
+    freeText: { suggestions, validators, unique, async, defaultSearch },
   };
   def.nodeFlags |= DtNodeFlags.TypeFreeText;
   return def;
@@ -275,6 +356,43 @@ export function isDtFreeTextDef<D = unknown, S = unknown>(
   def: DtNodeDef<D> | null,
 ): def is DtNodeDef<D> & { freeText: DtFreeTextDef<S> } {
   return isDtNodeDef<D>(def) && !!(def.nodeFlags & DtNodeFlags.TypeFreeText);
+}
+
+/** Whether the provided def object is of type NodeDef, consists of an FreeTextDef, and has the async option enabled. */
+export function isAsyncDtFreeTextDef<D>(
+  def: DtNodeDef<D> | null,
+): def is DtNodeDef<D> & {
+  freeText: DtFreeTextDef;
+  option: DtOptionDef;
+} {
+  return (
+    isDtFreeTextDef<D>(def) &&
+    isDtOptionDef<D>(def) &&
+    Boolean(def.freeText?.async)
+  );
+}
+
+/** Whether the provided def object is a valid NodeDef type, and has the async option enabled. */
+export function isAsyncDtOptionDef<D>(
+  def: DtNodeDef<D> | null,
+): def is DtNodeDef<D> & {
+  option: DtOptionDef;
+} {
+  return (
+    isAsyncDtAutocompleteDef(def) ||
+    isAsyncDtMultiSelectDef(def) ||
+    isAsyncDtMultiSelectDef(def) ||
+    isAsyncDtFreeTextDef(def)
+  );
+}
+
+/** Whether the provided def object is a valid NodeDef type, and has the partial option enabled. */
+export function isPartialDtOptionDef<D>(
+  def: DtNodeDef<D> | null,
+): def is DtNodeDef<D> & {
+  option: DtOptionDef;
+} {
+  return isPartialDtAutocompleteDef(def) || isPartialDtMultiSelectDef(def);
 }
 
 /** Whether the provided def object is of type RenderType */
@@ -293,6 +411,7 @@ function nodeDef<D = unknown>(
     existingNodeDef || {
       nodeFlags: 0,
       autocomplete: null,
+      multiSelect: null,
       freeText: null,
       option: null,
       group: null,
@@ -326,7 +445,8 @@ export class DtFilterFieldTagData {
 export type DtFilterValue =
   | DtAutocompleteValue<any>
   | DtFreeTextValue
-  | DtRangeValue;
+  | DtRangeValue
+  | DtMultiSelectValue<any>;
 
 /** One of the categories of values that one filter tag can be */
 export type DtFreeTextValue = string;
@@ -362,6 +482,29 @@ export function isDtRangeValue(value: any): value is DtRangeValue {
     value.hasOwnProperty('range')
   );
 }
+
+/** @internal */
+export type DtMultiSelectValue<T> = DtNodeDef<T> & {
+  multiOptions: DtOptionDef[];
+};
+/** Checks if a given value is of category DtMultiSelectValue */
+export function isDtMultiSelectValue<T>(
+  value: any,
+): value is DtMultiSelectValue<T> {
+  return (
+    isObject(value) &&
+    value.hasOwnProperty('multiSelect') &&
+    value.multiSelect !== void 0 &&
+    value.multiSelect !== null
+  );
+}
+
+/** @internal */
+export type _DtFilterValue =
+  | DtAutocompleteValue<any>
+  | DtFreeTextValue
+  | DtRangeValue
+  | DtMultiSelectValue<any>;
 
 /** @internal */
 export function _getSourceOfDtFilterValue<T>(value: DtFilterValue): T {

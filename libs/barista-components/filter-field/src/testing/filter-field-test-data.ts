@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,6 +50,36 @@ export const TEST_DATA_RANGE = {
   ],
 };
 
+export const TEST_DATA_MULTI_SELECT = {
+  autocomplete: [
+    {
+      name: 'Seasoning',
+      multiOptions: [
+        { name: 'None' },
+        {
+          name: 'Homemade',
+          options: [{ name: 'Ketchup' }, { name: 'Mustard' }, { name: 'Mayo' }],
+        },
+      ],
+    },
+  ],
+};
+
+export const TEST_DATA_MULTI_SELECT_EDIT_MODE = {
+  autocomplete: [
+    {
+      name: 'Seasoning',
+      multiOptions: [
+        { name: 'None' },
+        {
+          name: 'Homemade',
+          options: [{ name: 'Ketchup' }, { name: 'Mustard' }, { name: 'Mayo' }],
+        },
+      ],
+    },
+  ],
+};
+
 export const TEST_DATA_EDITMODE = {
   autocomplete: [
     {
@@ -95,6 +125,70 @@ export const TEST_DATA_EDITMODE = {
       name: 'DE (async)',
       async: true,
       autocomplete: [],
+    },
+  ],
+};
+
+export const TEST_DEFAULT_SEARCH_UNIQUE = {
+  autocomplete: [
+    {
+      name: 'DE',
+      defaultSearch: true,
+      autocomplete: [{ name: 'Berlin' }],
+      unique: true,
+    },
+    {
+      name: 'AUT',
+      autocomplete: [{ name: 'Vienna' }],
+    },
+  ],
+};
+
+export const TEST_DATA_KEYBOARD_NAVIGATION = {
+  autocomplete: [
+    {
+      name: 'AUT',
+      autocomplete: [
+        {
+          name: 'Upper Austria',
+        },
+        {
+          name: 'Lower Austria',
+        },
+        {
+          name: 'Vienna',
+        },
+        {
+          name: 'Salzburg',
+        },
+      ],
+    },
+  ],
+};
+
+export const TEST_DATA_PLACEHOLDER = {
+  name: 'Category',
+  value: 'category',
+  autocomplete: [
+    {
+      name: 'Locations',
+      autocomplete: [
+        {
+          name: 'Linz',
+          value: 'linz',
+          autocomplete: [
+            { name: 'Pöstlingberg' },
+            { name: 'Froschgarten' },
+            { name: 'Bachlberg' },
+            { name: 'St. Magdalena' },
+          ],
+        },
+        { name: 'Wels' },
+        { name: 'Steyr' },
+        { name: 'Leonding' },
+        { name: 'Traun' },
+        { name: 'Vöcklabruck' },
+      ],
     },
   ],
 };

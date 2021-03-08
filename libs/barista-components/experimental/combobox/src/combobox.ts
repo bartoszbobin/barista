@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -70,7 +70,11 @@ import {
 import { DtFormFieldControl } from '@dynatrace/barista-components/form-field';
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import {
+  coerceBooleanProperty,
+  BooleanInput,
+  NumberInput,
+} from '@angular/cdk/coercion';
 import { SelectionModel } from '@angular/cdk/collections';
 import { DOCUMENT } from '@angular/common';
 
@@ -142,6 +146,9 @@ export class DtCombobox<T>
     CanDisable,
     HasTabIndex,
     DtFormFieldControl<T> {
+  static ngAcceptInputType_disabled: BooleanInput;
+  static ngAcceptInputType_tabIndex: NumberInput;
+
   /** The ID for the combobox. */
   @Input() id: string;
   /** The currently selected value in the combobox. */
@@ -177,9 +184,19 @@ export class DtCombobox<T>
     }
   }
   _loading = false;
+  static ngAcceptInputType_loading: BooleanInput;
 
   /** Whether the control is required. */
-  @Input() required: boolean = false;
+  @Input()
+  get required(): boolean {
+    return this._required;
+  }
+  set required(value: boolean) {
+    this._required = coerceBooleanProperty(value);
+  }
+  private _required = false;
+  static ngAcceptInputType_required: BooleanInput;
+
   /** An arbitrary class name that is added to the combobox dropdown. */
   @Input() panelClass: string = '';
   /** A placeholder text for the input field. */
@@ -252,11 +269,14 @@ export class DtCombobox<T>
    */
   @ViewChild('autocompleteContent') _templatePortalContent: TemplateRef<any>;
   /** @internal The autocomplete instance that holds all options */
-  @ViewChild(DtAutocomplete) _autocomplete: DtAutocomplete<T>;
+  @ViewChild(DtAutocomplete, { static: true }) _autocomplete: DtAutocomplete<T>;
 
   /** @internal The options received via ng-content */
   @ContentChildren(DtOption, { descendants: true })
   _options: QueryList<DtOption<T>>;
+
+  /** @internal `View -> model callback called when value changes` */
+  _onChange: (value: T) => void = () => {};
 
   /** Whether the selection is currently empty. */
   get empty(): boolean {
@@ -332,6 +352,10 @@ export class DtCombobox<T>
       .subscribe(() => {
         this._resetInputValue();
       });
+
+    this._autocomplete.opened.pipe(takeUntil(this._destroy)).subscribe(() => {
+      this._closeOtherComboboxInstances();
+    });
   }
 
   ngAfterContentInit(): void {
@@ -431,16 +455,19 @@ export class DtCombobox<T>
     this._changeDetectorRef.markForCheck();
   }
 
+  private _closeOtherComboboxInstances(): void {
+    if (currentlyOpenCombobox && currentlyOpenCombobox !== this) {
+      currentlyOpenCombobox._autocompleteTrigger.closePanel();
+    }
+    currentlyOpenCombobox = this;
+  }
+
   /**
    * Opens the autocomplete panel and makes sure that all
    * other combobox panels are closed correctly.
    */
   private _openPanel(): void {
-    if (currentlyOpenCombobox && currentlyOpenCombobox !== this) {
-      currentlyOpenCombobox._autocompleteTrigger.closePanel();
-    }
     this._autocompleteTrigger.openPanel();
-    currentlyOpenCombobox = this;
   }
 
   /**
@@ -448,7 +475,7 @@ export class DtCombobox<T>
    * the global autocomplete panel case correctly.
    */
   private _closePanel(): void {
-    this._autocompleteTrigger.openPanel();
+    this._autocompleteTrigger.closePanel();
     currentlyOpenCombobox = null;
   }
 
@@ -496,6 +523,14 @@ export class DtCombobox<T>
       );
       this._writeValue();
     });
+  }
+
+  /**
+   * Saves a callback function to be invoked when the select's value
+   * changes from user input. Part of the ControlValueAccessor.
+   */
+  registerOnChange(fn: (value: T) => void): void {
+    this._onChange = fn;
   }
 
   /** Updates the selection by value using selection model and keymanager to handle the active item */

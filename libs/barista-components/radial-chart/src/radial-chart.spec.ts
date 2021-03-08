@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@
 // tslint:disable no-any max-file-line-count no-unbound-method use-component-selector
 
 import { Component, QueryList, ViewChildren } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DT_CHART_COLOR_PALETTE_ORDERED } from '@dynatrace/barista-components/theming';
 import {
   DtRadialChartModule,
@@ -39,14 +39,16 @@ describe('DtRadialChart', () => {
     series: '.dt-radial-chart-series',
   };
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [DtRadialChartModule],
-      declarations: [PieChart],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [DtRadialChartModule],
+        declarations: [PieChart],
+      });
 
-    TestBed.compileComponents();
-  }));
+      TestBed.compileComponents();
+    }),
+  );
 
   describe('dt-radial-chart', () => {
     let fixture: ComponentFixture<PieChart>;

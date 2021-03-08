@@ -77,14 +77,14 @@ class MyModule {}
 
 ### Calendar Body
 
-| Name           | Type                   | Default | Description                                                                                                                                              |
-| -------------- | ---------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| activeDate     | `T `                   | `today` | The date to display in this month view (everything other than the month and year is ignored).                                                            |
-| startAt        | `T \| null`            | `null`  | A date representing the period (month or year) to start the calendar with.                                                                               |
-| minDate        | `T \| null`            | `null`  | The minimum valid date.                                                                                                                                  |
-| maxDate        | `T \| null`            | `null`  | The maximum valid date.                                                                                                                                  |
-| dateFilter     | `(date: T) => boolean` | `null`  | Function used to filter whether a date is selectable or not.                                                                                             |
-| ariaLabelledby | `string`               | `null`  | Used for the aria-labelledby and aria-describedby properties of the calendar body. If not provided, the month and year are used as label ad description. |
+| Name           | Type                   | Default | Description                                                                                                                                               |
+| -------------- | ---------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| activeDate     | `T`                    | `today` | The date to display in this month view (everything other than the month and year is ignored).                                                             |
+| startAt        | `T \| null`            | `null`  | A date representing the period (month or year) to start the calendar with.                                                                                |
+| minDate        | `T \| null`            | `null`  | The minimum valid date.                                                                                                                                   |
+| maxDate        | `T \| null`            | `null`  | The maximum valid date.                                                                                                                                   |
+| dateFilter     | `(date: T) => boolean` | `null`  | Function used to filter whether a date is selectable or not.                                                                                              |
+| ariaLabelledby | `string`               | `null`  | Used for the aria-labelledby and aria-describedby properties of the calendar body. If not provided, the month and year are used as label and description. |
 
 ## Outputs
 
@@ -132,3 +132,7 @@ The following methods are on the `DtDatepicker` class:
 ## Calendar with limited date range
 
 <ba-live-example name="DtExampleCalendarMinMax" fullwidth></ba-live-example>
+
+## Timepicker with limited hour or minutes ranges
+
+<ba-live-example name="DtExampleTimepickerMinMax" fullwidth></ba-live-example>

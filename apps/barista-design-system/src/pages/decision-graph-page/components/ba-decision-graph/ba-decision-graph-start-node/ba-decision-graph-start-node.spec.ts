@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { waitForAsync, ComponentFixture, TestBed } from '@angular/core/testing';
 import { BaDecisionGraphStartnode } from './ba-decision-graph-start-node';
 import { nodes } from '../ba-decision-graph-test-data';
 
@@ -22,11 +22,13 @@ describe('BaDecisionGraphStartnode', () => {
   let component: BaDecisionGraphStartnode;
   let fixture: ComponentFixture<BaDecisionGraphStartnode>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [BaDecisionGraphStartnode],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [BaDecisionGraphStartnode],
+      }).compileComponents();
+    }),
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(BaDecisionGraphStartnode);

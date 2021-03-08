@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +18,7 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Component, ViewChild, DebugElement } from '@angular/core';
 import {
-  async,
+  waitForAsync,
   ComponentFixture,
   inject,
   TestBed,
@@ -41,6 +41,8 @@ import {
   DtStackedSeriesChartNode,
   DtStackedSeriesChartSeries,
   DtStackedSeriesChartValueDisplayMode,
+  DtStackedSeriesChartSelectionMode,
+  DtStackedSeriesChartLabelAxisMode,
 } from './stacked-series-chart.util';
 
 describe('DtStackedSeriesChart', () => {
@@ -57,6 +59,13 @@ describe('DtStackedSeriesChart', () => {
   };
 
   let selectedChangeSpy;
+
+  /** Gets the root element of the chart. */
+  function getChartContainer(): DebugElement {
+    return fixture.debugElement.query(
+      By.css('.dt-stacked-series-chart-container'),
+    );
+  }
 
   /** Gets all tracks within the rendered chart. */
   function getAllTracks(): DebugElement[] {
@@ -78,6 +87,11 @@ describe('DtStackedSeriesChart', () => {
     );
   }
 
+  /** Gets a specific stack at a specific position */
+  function getTrackByPosition(trackIndex: number): DebugElement {
+    return getAllTracks()[trackIndex];
+  }
+
   /** Gets a specific slice at a specific position */
   function getSliceByPositionWithinTrack(
     trackIndex: number,
@@ -85,6 +99,13 @@ describe('DtStackedSeriesChart', () => {
   ): DebugElement {
     const track = getAllTracks()[trackIndex];
     return track.queryAll(By.css('.dt-stacked-series-chart-slice'))[sliceIndex];
+  }
+
+  /** Gets the selected slice */
+  function getSelectedTrack(): DebugElement {
+    return fixture.debugElement.query(
+      By.css('.dt-stacked-series-chart-track-selected'),
+    );
   }
 
   /** Gets the selected slice */
@@ -146,27 +167,29 @@ describe('DtStackedSeriesChart', () => {
     );
   }
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
-        DtStackedSeriesChartModule,
-        DtThemingModule,
-      ],
-      declarations: [TestApp, DefaultsTestApp],
-      providers: [{ provide: DT_UI_TEST_CONFIG, useValue: overlayConfig }],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [
+          HttpClientTestingModule,
+          DtIconModule.forRoot({ svgIconLocation: `{{name}}.svg` }),
+          DtStackedSeriesChartModule,
+          DtThemingModule,
+        ],
+        declarations: [TestApp, DefaultsTestApp],
+        providers: [{ provide: DT_UI_TEST_CONFIG, useValue: overlayConfig }],
+      });
 
-    TestBed.compileComponents();
-    fixture = createComponent(TestApp);
+      TestBed.compileComponents();
+      fixture = createComponent(TestApp);
 
-    rootComponent = fixture.componentInstance;
-    component = fixture.debugElement.query(By.directive(DtStackedSeriesChart))
-      .componentInstance;
+      rootComponent = fixture.componentInstance;
+      component = fixture.debugElement.query(By.directive(DtStackedSeriesChart))
+        .componentInstance;
 
-    selectedChangeSpy = jest.spyOn(component.selectedChange, 'emit');
-  }));
+      selectedChangeSpy = jest.spyOn(component.selectedChange, 'emit');
+    }),
+  );
 
   describe('should have defaults', () => {
     let defComponent;
@@ -242,7 +265,7 @@ describe('DtStackedSeriesChart', () => {
       expect(selected).toBe(sliceByPosition);
     });
 
-    it('should make a selection', () => {
+    it('should make a node selection', () => {
       const sliceByPosition = getSliceByPositionWithinTrack(1, 1);
       dispatchFakeEvent(sliceByPosition.nativeElement, 'click');
       fixture.detectChanges();
@@ -254,6 +277,31 @@ describe('DtStackedSeriesChart', () => {
         component._tracks[1].nodes[1].origin,
       ]);
       expect(selected).toBe(sliceByPosition);
+    });
+
+    it('should toggle stack selection', () => {
+      rootComponent.selectionMode = 'stack';
+      fixture.detectChanges();
+
+      let trackByPosition = getTrackByPosition(2);
+      dispatchFakeEvent(trackByPosition.nativeElement, 'click');
+      fixture.detectChanges();
+
+      let selected = getSelectedTrack();
+
+      expect(selectedChangeSpy).toHaveBeenCalledWith([
+        component._tracks[2].origin,
+        undefined,
+      ]);
+      expect(selected).toBe(trackByPosition);
+
+      trackByPosition = getTrackByPosition(1);
+      dispatchFakeEvent(trackByPosition.nativeElement, 'click');
+      fixture.detectChanges();
+
+      selected = getSelectedTrack();
+
+      expect(selected).toBe(trackByPosition);
     });
 
     it('should not allow selection from input if disabled', () => {
@@ -277,6 +325,22 @@ describe('DtStackedSeriesChart', () => {
       dispatchFakeEvent(sliceByPosition.nativeElement, 'click');
 
       expect(selectedChangeSpy).not.toHaveBeenCalled();
+    });
+
+    it('should clear the selection from the outside on stack mode', () => {
+      rootComponent.selectionMode = 'stack';
+      rootComponent.selected = [
+        stackedSeriesChartDemoDataCoffee[1],
+        stackedSeriesChartDemoDataCoffee[1].nodes[1],
+      ];
+      fixture.detectChanges();
+
+      expect(getSelectedSlice() !== null).toBe(true);
+
+      rootComponent.selected = [];
+      fixture.detectChanges();
+
+      expect(getSelectedSlice()).toBe(null);
     });
   });
 
@@ -522,6 +586,16 @@ describe('DtStackedSeriesChart', () => {
         const axis = getSeriesAxis();
         expect(axis).toBeFalsy();
       });
+
+      it('should not compact the labels on bar compact mode', () => {
+        rootComponent.labelAxisMode = 'compact';
+        fixture.detectChanges();
+
+        const chartContainer = getChartContainer();
+        expect(
+          chartContainer.nativeElement.getAttribute('class'),
+        ).not.toContain('dt-stacked-series-chart-series-axis-compact-mode');
+      });
     });
 
     describe('Column', () => {
@@ -557,6 +631,16 @@ describe('DtStackedSeriesChart', () => {
       it('should display the series axis', () => {
         const axis = getSeriesAxis();
         expect(axis).toBeTruthy();
+      });
+
+      it('should compact the labels on column compact mode', () => {
+        rootComponent.labelAxisMode = 'compact';
+        fixture.detectChanges();
+
+        const chartContainer = getChartContainer();
+        expect(chartContainer.nativeElement.getAttribute('class')).toContain(
+          'dt-stacked-series-chart-series-axis-compact-mode',
+        );
       });
     });
   });
@@ -595,6 +679,7 @@ describe('DtStackedSeriesChart', () => {
       [series]="series"
       [selected]="selected"
       [selectable]="selectable"
+      [selectionMode]="selectionMode"
       [valueDisplayMode]="valueDisplayMode"
       [max]="max"
       [fillMode]="fillMode"
@@ -602,6 +687,7 @@ describe('DtStackedSeriesChart', () => {
       [visibleLegend]="visibleLegend"
       [visibleTrackBackground]="visibleTrackBackground"
       [visibleLabel]="visibleLabel"
+      [labelAxisMode]="labelAxisMode"
       [visibleValueAxis]="visibleValueAxis"
       [mode]="mode"
       [maxTrackSize]="maxTrackSize"
@@ -617,6 +703,7 @@ describe('DtStackedSeriesChart', () => {
 class TestApp {
   series: DtStackedSeriesChartSeries[] = stackedSeriesChartDemoDataCoffee;
   selectable: boolean = true;
+  selectionMode: DtStackedSeriesChartSelectionMode = 'node';
   selected: [DtStackedSeriesChartSeries, DtStackedSeriesChartNode] | [] = [];
   valueDisplayMode: DtStackedSeriesChartValueDisplayMode;
   max: number;
@@ -625,6 +712,7 @@ class TestApp {
   visibleLegend: boolean = true;
   visibleTrackBackground: boolean = true;
   visibleLabel: boolean = true;
+  labelAxisMode: DtStackedSeriesChartLabelAxisMode = 'full';
   visibleValueAxis: boolean = true;
   mode: DtStackedSeriesChartMode;
   maxTrackSize: number;

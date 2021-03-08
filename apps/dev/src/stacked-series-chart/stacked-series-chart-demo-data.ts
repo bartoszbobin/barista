@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2020 Dynatrace LLC
+ * Copyright 2021 Dynatrace LLC
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,6 +64,53 @@ export const stackedSeriesChartDemoData = [
       {
         value: 1,
         label: 'Milk',
+      },
+    ],
+  },
+  {
+    label: 'Caffé latte (Extra latte)',
+    nodes: [
+      {
+        value: 2,
+        label: 'Coffee',
+      },
+      {
+        value: 3,
+        label: 'Milk',
+      },
+    ],
+  },
+  {
+    label: 'Cappuccino',
+    nodes: [
+      {
+        value: 2,
+        label: 'Milk',
+      },
+      {
+        value: 2,
+        label: 'Coffee',
+      },
+    ],
+  },
+  {
+    label: 'Caramel Frappucino',
+    nodes: [
+      {
+        value: 1,
+        label: 'Milk',
+      },
+      {
+        value: 1,
+        label: 'Coffee',
+      },
+      {
+        value: 1,
+        label: 'Caramel',
+      },
+      {
+        value: 1,
+        label: 'Ice',
       },
     ],
   },
